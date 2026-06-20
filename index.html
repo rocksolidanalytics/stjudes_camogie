@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>St Judes Camogie — 2026 Dashboard</title>
+<style>
+:root{
+  --bg:#06080f;--card:#0c0f1e;--card2:#0f1228;--border:#1a1e38;
+  --white:#eef2f8;--slate:#7a85aa;--navy:#0b1c6e;
+  --gold:#5ba3e0;--gold2:#3d8ac8;--gold3:#88c0f0;
+  --green:#34c967;--red:#e04545;--amber:#f5c518;
+  --neon:#5ba3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--white);font-family:Georgia,serif;min-height:100vh}
+.hdr{background:linear-gradient(90deg,#070d2a,#04060f);padding:14px 18px;border-bottom:1px solid rgba(91,163,224,0.35);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-eye{font-size:9px;font-family:monospace;letter-spacing:3px;color:var(--gold);margin-bottom:3px}
+.hdr-title{font-size:17px;font-weight:900}
+.hdr-badge{width:38px;height:38px;border-radius:10px;background:rgba(91,163,224,0.1);border:1px solid rgba(91,163,224,0.4);display:flex;align-items:center;justify-content:center;font-size:20px}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:#04050e;position:sticky;top:60px;z-index:90;overflow-x:auto}
+.tab{padding:11px 18px;font-size:11px;font-family:monospace;letter-spacing:1px;color:var(--slate);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.panel{display:none;padding:18px 14px 70px;max-width:860px;margin:0 auto}
+.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:13px}
+.card-hl{background:linear-gradient(135deg,rgba(11,28,110,0.5),#05060f);border-color:rgba(91,163,224,0.3)}
+.ct{font-size:9px;font-family:monospace;letter-spacing:2px;color:var(--slate);margin-bottom:13px}
+/* HERO */
+.hero{background:linear-gradient(135deg,#0b1c6e 0%,#040820 55%);border-radius:15px;padding:20px 18px;margin-bottom:14px;border:1px solid rgba(91,163,224,0.3);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-25px;right:-25px;width:130px;height:130px;border-radius:50%;background:rgba(91,163,224,0.05);border:1px solid rgba(91,163,224,0.12)}
+.hero-eye{font-size:9px;font-family:monospace;letter-spacing:3px;color:var(--gold);margin-bottom:7px}
+.hero-rec{font-size:30px;font-weight:900;letter-spacing:-1px;margin-bottom:3px}
+.hero-sub{font-size:11px;color:var(--slate);margin-bottom:16px}
+.hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.hstat{background:rgba(255,255,255,0.05);border-radius:9px;padding:11px;text-align:center}
+.hstat-v{font-size:19px;font-weight:800;color:var(--gold)}
+.hstat-l{font-size:9px;font-family:monospace;color:var(--slate);margin-top:2px}
+/* RESULT ROWS */
+.rrow{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px 15px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.rbadge{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;font-family:monospace;flex-shrink:0}
+.rbadge.W{background:rgba(52,201,103,.15);border:1px solid rgba(52,201,103,.4);color:var(--green)}
+.rbadge.L{background:rgba(224,69,69,.15);border:1px solid rgba(224,69,69,.4);color:var(--red)}
+.rbadge.D{background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.4);color:var(--amber)}
+.rinfo{flex:1;margin-left:11px}
+.ropp{font-size:13px;font-weight:700}
+.rmeta{font-size:11px;color:var(--slate);margin-top:1px}
+.rscore{font-family:monospace;font-size:12px;font-weight:700;color:var(--gold);text-align:right;line-height:1.5}
+/* STAT BAR */
+.sbar-wrap{margin-bottom:11px}
+.sbar-lbls{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.sbar-lbls .lbl{color:var(--slate);font-size:10px;text-align:center}
+.sbar-bg{height:4px;background:#080b18;border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;background:linear-gradient(90deg,var(--navy),var(--gold));border-radius:2px}
+/* SCORERS */
+.scrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.scrow:last-child{border-bottom:none}
+.scrk{width:22px;height:22px;border-radius:5px;background:rgba(11,28,110,.8);border:1px solid rgba(91,163,224,.25);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold);font-family:monospace;flex-shrink:0}
+.scname{flex:1;margin-left:9px;font-size:12px;font-weight:600}
+.scscore{font-family:monospace;font-size:12px;color:var(--gold);font-weight:700}
+.sctot{font-size:10px;color:var(--slate);margin-left:7px}
+/* CONTACTS TABLE */
+.ctrow{display:grid;grid-template-columns:1fr 2fr 1fr 1fr 1fr;gap:4px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;align-items:center}
+.ctrow:last-child{border-bottom:none}
+.cthdr{font-size:9px;font-family:monospace;color:var(--slate);letter-spacing:1px}
+/* PITCH MAP */
+.pitch-wrap{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:9px;margin-bottom:13px}
+svg.pitch{display:block;width:100%;border-radius:7px}
+/* LEGEND */
+.legend{display:flex;gap:13px;flex-wrap:wrap;padding:9px 13px;background:var(--card);border:1px solid var(--border);border-radius:9px;margin-bottom:12px;align-items:center}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+/* ZONE GRID */
+.zone-grid{display:flex;gap:8px;margin-bottom:13px;flex-wrap:wrap}
+.zone-card{flex:1;min-width:100px;background:var(--card);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--border)}
+.zone-pct{font-size:22px;font-weight:800}
+.zone-lbl{font-size:9px;font-family:monospace;color:var(--slate);margin-top:2px}
+.zone-sub{font-size:10px;color:var(--slate);margin-top:3px}
+/* PO GRID */
+.po-grid-wrap{display:grid;grid-template-columns:60px repeat(3,1fr);gap:3px;margin-bottom:13px}
+.po-cell{background:var(--card2);border-radius:7px;padding:8px 4px;text-align:center;font-size:11px}
+.po-cell.hdr-cell{background:transparent;font-size:9px;font-family:monospace;color:var(--slate);letter-spacing:1px;display:flex;align-items:center;justify-content:center}
+.po-pct{font-size:16px;font-weight:800}
+.po-sub{font-size:9px;color:var(--slate);margin-top:1px}
+/* SPEED BAR */
+.spd-wrap{margin-bottom:12px}
+.spd-title{font-size:10px;font-family:monospace;color:var(--slate);margin-bottom:7px;letter-spacing:1px}
+.spd-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.spd-lbl{font-size:10px;width:80px;flex-shrink:0;color:var(--slate)}
+.spd-bar-bg{flex:1;height:14px;background:#080b18;border-radius:3px;position:relative;overflow:visible}
+.spd-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--navy),var(--gold));position:relative}
+.spd-val{font-size:10px;font-family:monospace;color:var(--gold);margin-left:5px;flex-shrink:0;width:32px}
+/* MATRIX */
+.matrix-wrap{display:grid;grid-template-columns:52px repeat(3,1fr);gap:3px;margin-bottom:13px}
+.mx-cell{background:var(--card2);border-radius:7px;padding:7px 4px;text-align:center}
+.mx-cell.hdr{background:transparent;font-size:9px;font-family:monospace;color:var(--slate);letter-spacing:.5px;display:flex;align-items:center;justify-content:center}
+.mx-pct{font-size:15px;font-weight:800}
+.mx-sub{font-size:9px;color:var(--slate);margin-top:1px}
+/* PERIOD CHART */
+.per-chart{display:flex;gap:5px;align-items:flex-end;height:110px;padding:0 3px;margin-bottom:8px}
+.per-grp{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.per-bars{display:flex;gap:2px;align-items:flex-end;height:88px}
+.per-bar{width:11px;border-radius:2px 2px 0 0;transition:height .4s}
+.per-bar.j{background:linear-gradient(180deg,var(--gold),var(--navy))}
+.per-bar.o{background:#1a1e38}
+.per-lbl{font-size:8px;color:var(--slate);font-family:monospace;text-align:center;line-height:1.2}
+/* PERIOD TABLE */
+.per-table{border-radius:9px;overflow:hidden;border:1px solid var(--border)}
+.per-thead{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 13px;background:rgba(0,0,0,.3);font-size:9px;font-family:monospace;color:var(--slate);letter-spacing:1px;border-bottom:1px solid var(--border)}
+.per-trow{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 13px;font-size:12px;border-bottom:1px solid var(--border)}
+.per-trow:last-child{border-bottom:none}
+.dp{color:var(--green);font-weight:700}.dn{color:var(--red);font-weight:700}.dz{color:var(--slate)}
+/* COMMENTARY */
+.commentary{background:linear-gradient(135deg,rgba(11,28,110,.25),#04050f);border:1px solid rgba(91,163,224,.25);border-radius:12px;padding:14px 16px;margin-bottom:13px}
+.com-eye{font-size:9px;font-family:monospace;letter-spacing:2px;color:var(--gold);margin-bottom:10px}
+.com-item{display:flex;gap:10px;font-size:12px;line-height:1.65;margin-bottom:8px;color:var(--white)}
+.com-item:last-child{margin-bottom:0}
+.com-dot{color:var(--gold);flex-shrink:0;margin-top:2px}
+.com-item strong{color:var(--gold3)}
+/* MATCH SELECT */
+.msel{width:100%;background:var(--card);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:13px;font-family:Georgia,serif}
+/* SCORE CARD */
+.score-card{background:linear-gradient(135deg,rgba(11,28,110,.5),#04050f);border:1px solid rgba(91,163,224,.3);border-radius:14px;padding:20px;text-align:center;margin-bottom:13px}
+/* FROM PLAY vs FREE */
+.fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px}
+.fp-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px;text-align:center}
+.fp-val{font-size:24px;font-weight:800;color:var(--gold)}
+.fp-lbl{font-size:9px;font-family:monospace;color:var(--slate);margin-top:3px}
+/* FILTER BTNS */
+.fbtn{padding:6px 13px;background:var(--card);border:1px solid var(--border);border-radius:20px;color:var(--slate);font-size:11px;font-family:monospace;cursor:pointer}
+.fbtn.active{color:var(--gold);border-color:var(--gold)}
+/* TOGGLE */
+.toggle-row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+/* FOOTER */
+.footer{text-align:center;padding:22px;font-size:10px;font-family:monospace;color:var(--slate);letter-spacing:1px;border-top:1px solid var(--border)}
+@media(min-width:560px){.hero-grid{grid-template-columns:repeat(4,1fr)}.fp-grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div><div class="hdr-eye">ST JUDES CAMOGIE · 2026</div><div class="hdr-title">Season Dashboard</div></div>
+  <div class="hdr-badge">🏑</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('all',this)">All Matches</div>
+  <div class="tab" onclick="showTab('match',this)">Match Reports</div>
+  <div class="tab" onclick="showTab('latest',this)">Latest Match</div>
+</div>
+
+<!-- ═══ TAB 1: ALL MATCHES ═══ -->
+<div class="panel active" id="tab-all">
+
+  <div class="hero">
+    <div class="hero-eye" id="all-eye">2026 SEASON · 8 MATCHES</div>
+    <div class="hero-rec" id="all-rec">—</div>
+    <div class="hero-sub" id="all-sub">SFL · AFL · Challenge</div>
+    <div class="hero-grid" id="all-hgrid"></div>
+  </div>
+
+  <div style="font-size:9px;font-family:monospace;letter-spacing:2px;color:var(--slate);padding:0 2px 8px">RESULTS</div>
+  <div id="all-results"></div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="ct">SEASON TEAM COMPARISON</div>
+    <div id="all-scomp"></div>
+  </div>
+
+  <div class="fp-grid" id="all-fp"></div>
+
+  <div class="card">
+    <div class="ct">SCORING BY 10-MINUTE PERIOD — SEASON</div>
+    <div class="per-chart" id="all-perchart"></div>
+    <div style="display:flex;gap:14px;justify-content:center;margin-top:8px">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span style="font-size:11px">St Judes</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:#1a1e38"></div><span style="font-size:11px">Opposition</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">SEASON SCORING LEADERBOARD</div>
+    <div id="all-scorers"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">CONTACT LEADERS — SEASON</div>
+    <div class="ctrow cthdr"><span>#</span><span>Player</span><span style="text-align:center">MP</span><span style="text-align:center">Total</span><span style="text-align:center">Per Game</span></div>
+    <div id="all-contacts"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">SEASON SHOT MAP — ALL SHOTS</div>
+    <div class="toggle-row">
+      <button class="fbtn active" onclick="setShotFilter('all',this,'season')">All</button>
+      <button class="fbtn" onclick="setShotFilter('scored',this,'season')">Scored</button>
+      <button class="fbtn" onclick="setShotFilter('missed',this,'season')">Missed</button>
+      <button class="fbtn" onclick="setShotFilter('free',this,'season')">From Free</button>
+    </div>
+    <div class="pitch-wrap"><svg id="season-shot-svg" class="pitch" viewBox="0 0 440 250"></svg></div>
+    <div class="legend" id="shot-legend-s">
+      <span style="font-size:9px;font-family:monospace;letter-spacing:1.5px;color:var(--slate)">TRAJECTORIES</span>
+      <div class="leg-item"><svg width="20" height="6"><line x1="0" y1="3" x2="20" y2="3" stroke="#34c967" stroke-width="2"/></svg><span>Point play</span></div>
+      <div class="leg-item"><svg width="20" height="6"><line x1="0" y1="3" x2="20" y2="3" stroke="var(--gold)" stroke-width="2"/></svg><span>Point free</span></div>
+      <div class="leg-item"><svg width="20" height="6"><line x1="0" y1="3" x2="20" y2="3" stroke="#f5c518" stroke-width="2.5"/></svg><span>Goal</span></div>
+      <div class="leg-item"><svg width="20" height="6"><line x1="0" y1="3" x2="20" y2="3" stroke="#ff5533" stroke-width="1.5" stroke-dasharray="4,2"/></svg><span>Wide/Blocked</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px" id="shot-stats-s"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">SHOT CONVERSION BY ZONE — ST JUDES</div>
+    <div class="zone-grid" id="all-zones-us"></div>
+    <div class="ct" style="margin-top:10px">SHOT CONVERSION BY ZONE — OPPOSITION</div>
+    <div class="zone-grid" id="all-zones-opp"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">SEASON PUCK-OUT MAP — ST JUDES</div>
+    <div class="toggle-row">
+      <button class="fbtn active" onclick="setPoFilter('all',this,'season-us')">All</button>
+      <button class="fbtn" onclick="setPoFilter('won',this,'season-us')">Won</button>
+      <button class="fbtn" onclick="setPoFilter('lost',this,'season-us')">Lost</button>
+    </div>
+    <div class="pitch-wrap"><svg id="season-po-us-svg" class="pitch" viewBox="0 0 440 250"></svg></div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div><span>Won</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div><span>Lost</span></div>
+    </div>
+    <div class="ct" style="margin-top:4px">PUCK-OUT WIN % BY ZONE — ST JUDES</div>
+    <div class="po-grid-wrap" id="po-grid-us"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">SEASON PUCK-OUT MAP — OPPOSITION</div>
+    <div class="pitch-wrap"><svg id="season-po-opp-svg" class="pitch" viewBox="0 0 440 250"></svg></div>
+    <div class="ct" style="margin-top:4px">PUCK-OUT WIN % BY ZONE — OPPOSITION</div>
+    <div class="po-grid-wrap" id="po-grid-opp"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">PUCK-OUT SPEED — POST-SCORE vs POST-WIDE</div>
+    <div id="all-pospeed"></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">PUCK-OUT INTELLIGENCE — DISTANCE × SPEED MATRIX</div>
+    <div style="font-size:11px;color:var(--slate);margin-bottom:10px">Win % by how far and how fast St Judes restart · <span id="ko-total"></span> puck-outs analysed</div>
+    <div class="matrix-wrap" id="ko-matrix"></div>
+    <div style="font-size:10px;color:var(--slate);margin-top:6px" id="ko-thresholds"></div>
+  </div>
+
+  <div class="commentary">
+    <div class="com-eye">◉ SEASON ANALYSIS</div>
+    <div id="all-commentary"></div>
+  </div>
+
+</div><!-- /tab-all -->
+
+<!-- ═══ TAB 2: MATCH REPORTS ═══ -->
+<div class="panel" id="tab-match">
+  <select class="msel" id="match-select" onchange="renderMatch()"></select>
+  <div id="match-content"></div>
+</div>
+
+<!-- ═══ TAB 3: LATEST MATCH ═══ -->
+<div class="panel" id="tab-latest">
+  <div id="latest-content"></div>
+</div>
+
+<div class="footer">Rock Solid Analytics · St Judes Camogie · 2026 · <span style="color:var(--gold)">rocksolidanalytics.github.io</span></div>
+
+<script>
+window.__RSA__ = {"record":{"W":5,"L":2,"D":1,"ptsFor":128,"ptsAg":84},"allMatches":[{"opp":"Erins Isle","date":"25 Mar 2026","comp":"SFL","result":"W","rd":1,"jg":0,"jp":8,"jfg":0,"jfp":4,"og":0,"op":5,"jshots":23,"oshots":23,"jscored":8,"oscored":5,"jconv":35,"oconv":22,"jpl":13,"opl":0,"jpo_won":7,"jpo_total":15,"opo_won":7,"opo_total":16,"prod_us":6.1,"prod_opp":6.1,"scorers":[{"name":"Ellie Young","score":"0-03","frees":"(0g 2f)","tot":3},{"name":"Lauren Kearney","score":"0-02","frees":"","tot":2},{"name":"Sin\u00e9ad Nolan","score":"0-02","frees":"(0g 2f)","tot":2},{"name":"Roisin Connolly","score":"0-01","frees":"","tot":1}],"periods_us":[2,0,2,0,3,1],"periods_opp":[1,2,0,0,1,1],"shots_us":[{"x":0.7237,"y":0.5305,"scored":true,"free":false,"goal":false},{"x":0.7671,"y":0.7693,"scored":true,"free":false,"goal":false},{"x":0.8572,"y":0.4129,"scored":false,"free":false,"goal":false},{"x":0.6909,"y":0.7902,"scored":false,"free":false,"goal":false},{"x":0.7799,"y":0.3413,"scored":false,"free":false,"goal":false},{"x":0.7707,"y":0.9257,"scored":false,"free":false,"goal":false},{"x":0.5298,"y":0.3442,"scored":false,"free":false,"goal":false},{"x":0.7203,"y":0.647,"scored":false,"free":false,"goal":false},{"x":0.7488,"y":0.4749,"scored":true,"free":true,"goal":false},{"x":0.7029,"y":0.4868,"scored":true,"free":false,"goal":false},{"x":0.5348,"y":0.4547,"scored":false,"free":true,"goal":false},{"x":0.793,"y":0.6081,"scored":false,"free":false,"goal":false},{"x":0.8762,"y":0.3919,"scored":false,"free":false,"goal":false},{"x":0.7532,"y":0.4538,"scored":false,"free":false,"goal":false},{"x":0.6769,"y":0.3492,"scored":false,"free":false,"goal":false},{"x":0.9151,"y":0.3338,"scored":false,"free":false,"goal":false},{"x":0.6825,"y":0.3896,"scored":true,"free":true,"goal":false},{"x":0.7669,"y":0.7045,"scored":true,"free":true,"goal":false},{"x":0.8186,"y":0.2625,"scored":false,"free":false,"goal":false},{"x":0.7514,"y":0.5999,"scored":true,"free":false,"goal":false},{"x":0.7177,"y":0.6809,"scored":false,"free":false,"goal":false},{"x":0.7216,"y":0.7152,"scored":true,"free":true,"goal":false},{"x":0.7955,"y":0.3929,"scored":false,"free":true,"goal":false}],"shots_opp":[{"x":0.8259,"y":0.7104,"scored":false,"free":false,"goal":false},{"x":0.5743,"y":0.3551,"scored":false,"free":true,"goal":false},{"x":0.6561,"y":0.3538,"scored":false,"free":true,"goal":false},{"x":0.8549,"y":0.7743,"scored":false,"free":true,"goal":false},{"x":0.7225,"y":0.4252,"scored":true,"free":false,"goal":false},{"x":0.6404,"y":0.7556,"scored":false,"free":true,"goal":false},{"x":0.7203,"y":0.5903,"scored":false,"free":false,"goal":false},{"x":0.8121,"y":0.7406,"scored":true,"free":false,"goal":false},{"x":0.8664,"y":0.6434,"scored":false,"free":false,"goal":false},{"x":0.8636,"y":0.6703,"scored":true,"free":true,"goal":false},{"x":0.7554,"y":0.3804,"scored":false,"free":false,"goal":false},{"x":0.7501,"y":0.4162,"scored":false,"free":true,"goal":false},{"x":0.6666,"y":0.6225,"scored":false,"free":true,"goal":false},{"x":0.719,"y":0.9255,"scored":false,"free":true,"goal":false},{"x":0.6884,"y":0.3578,"scored":false,"free":false,"goal":false},{"x":0.8653,"y":0.349,"scored":false,"free":false,"goal":false},{"x":0.6553,"y":0.4322,"scored":false,"free":false,"goal":false},{"x":0.7318,"y":0.499,"scored":true,"free":true,"goal":false},{"x":0.6998,"y":0.1957,"scored":false,"free":true,"goal":false},{"x":0.6725,"y":0.2302,"scored":false,"free":true,"goal":false},{"x":0.7632,"y":0.5985,"scored":true,"free":false,"goal":false},{"x":0.7053,"y":0.2741,"scored":false,"free":false,"goal":false},{"x":0.7024,"y":0.4393,"scored":false,"free":false,"goal":false}],"po_us":[{"x":0.6488,"y":0.2451,"won":false,"dist":"Mid","side":"Left"},{"x":0.5453,"y":0.1887,"won":false,"dist":"Short","side":"Left"},{"x":0.7352,"y":0.2455,"won":false,"dist":"Long","side":"Left"},{"x":0.5124,"y":0.1969,"won":false,"dist":"Short","side":"Left"},{"x":0.7622,"y":0.3187,"won":true,"dist":"Long","side":"Left"},{"x":0.5226,"y":0.2316,"won":true,"dist":"Short","side":"Left"},{"x":0.6541,"y":0.3631,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6243,"y":0.8684,"won":false,"dist":"Mid","side":"Right"},{"x":0.7186,"y":0.3456,"won":false,"dist":"Long","side":"Centre"},{"x":0.525,"y":0.1399,"won":false,"dist":"Short","side":"Left"},{"x":0.5536,"y":0.1019,"won":true,"dist":"Short","side":"Left"},{"x":0.7273,"y":0.6956,"won":true,"dist":"Long","side":"Right"},{"x":0.7405,"y":0.6722,"won":false,"dist":"Long","side":"Right"},{"x":0.5589,"y":0.7518,"won":true,"dist":"Short","side":"Right"},{"x":0.6354,"y":0.6686,"won":true,"dist":"Mid","side":"Right"}],"po_opp":[{"x":0.6163,"y":0.7049,"won":false,"dist":"Mid","side":"Right"},{"x":0.6584,"y":0.4506,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6686,"y":0.3787,"won":true,"dist":"Mid","side":"Centre"},{"x":0.543,"y":0.8369,"won":false,"dist":"Short","side":"Right"},{"x":0.8114,"y":0.5047,"won":true,"dist":"Long","side":"Centre"},{"x":0.5716,"y":0.7449,"won":false,"dist":"Short","side":"Right"},{"x":0.5664,"y":0.7651,"won":false,"dist":"Short","side":"Right"},{"x":0.8294,"y":0.5167,"won":true,"dist":"Long","side":"Centre"},{"x":0.6086,"y":0.8019,"won":false,"dist":"Mid","side":"Right"},{"x":0.6123,"y":0.0995,"won":true,"dist":"Mid","side":"Left"},{"x":0.6858,"y":0.3468,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5223,"y":0.1304,"won":false,"dist":"Short","side":"Left"},{"x":0.6161,"y":0.1328,"won":true,"dist":"Mid","side":"Left"},{"x":0.624,"y":0.3896,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5014,"y":0.2504,"won":false,"dist":"Short","side":"Left"},{"x":0.5391,"y":0.1743,"won":true,"dist":"Short","side":"Left"}]},{"opp":"Oper Sc","date":"02 Apr 2026","comp":"SFL","result":"W","rd":2,"jg":2,"jp":10,"jfg":0,"jfp":4,"og":0,"op":7,"jshots":28,"oshots":19,"jscored":12,"oscored":7,"jconv":43,"oconv":37,"jpl":30,"opl":0,"jpo_won":5,"jpo_total":10,"opo_won":11,"opo_total":20,"prod_us":7.6,"prod_opp":5.3,"scorers":[{"name":"Joye Atkinson","score":"2-01","frees":"","tot":7},{"name":"Ellie Young","score":"0-03","frees":"(0g 1f)","tot":3},{"name":"Sin\u00e9ad Nolan","score":"0-03","frees":"(0g 3f)","tot":3},{"name":"Alex Falvey","score":"0-01","frees":"","tot":1},{"name":"Lauren Kearney","score":"0-01","frees":"","tot":1},{"name":"Caoimhe French","score":"0-01","frees":"","tot":1}],"periods_us":[0,1,2,5,6,2],"periods_opp":[0,2,0,2,0,3],"shots_us":[{"x":0.9059,"y":0.4108,"scored":false,"free":false,"goal":false},{"x":0.8605,"y":0.7438,"scored":false,"free":false,"goal":false},{"x":0.8989,"y":0.3322,"scored":true,"free":false,"goal":false},{"x":0.7033,"y":0.5132,"scored":false,"free":false,"goal":false},{"x":0.9356,"y":0.6221,"scored":false,"free":false,"goal":false},{"x":0.6898,"y":0.531,"scored":true,"free":false,"goal":false},{"x":0.9266,"y":0.3713,"scored":false,"free":false,"goal":false},{"x":0.7109,"y":0.1757,"scored":false,"free":false,"goal":false},{"x":0.8565,"y":0.7311,"scored":false,"free":false,"goal":false},{"x":0.865,"y":0.2577,"scored":false,"free":false,"goal":false},{"x":0.6623,"y":0.392,"scored":true,"free":true,"goal":false},{"x":0.8087,"y":0.5748,"scored":true,"free":true,"goal":false},{"x":0.8264,"y":0.6199,"scored":true,"free":true,"goal":false},{"x":0.8587,"y":0.466,"scored":false,"free":false,"goal":false},{"x":0.882,"y":0.3494,"scored":false,"free":false,"goal":false},{"x":0.7101,"y":0.4802,"scored":false,"free":false,"goal":false},{"x":0.935,"y":0.4561,"scored":true,"free":false,"goal":true},{"x":0.7361,"y":0.686,"scored":false,"free":false,"goal":false},{"x":0.8545,"y":0.7155,"scored":false,"free":false,"goal":false},{"x":0.7413,"y":0.6864,"scored":true,"free":false,"goal":false},{"x":0.7859,"y":0.6301,"scored":true,"free":false,"goal":false},{"x":0.8903,"y":0.4358,"scored":true,"free":false,"goal":true},{"x":0.8337,"y":0.7209,"scored":true,"free":false,"goal":false},{"x":0.7015,"y":0.6033,"scored":false,"free":false,"goal":false},{"x":0.7185,"y":0.6224,"scored":false,"free":true,"goal":false},{"x":0.7091,"y":0.2016,"scored":true,"free":true,"goal":false},{"x":0.7055,"y":0.6488,"scored":true,"free":false,"goal":false},{"x":0.7759,"y":0.3368,"scored":false,"free":false,"goal":false}],"shots_opp":[{"x":0.6923,"y":0.7211,"scored":false,"free":true,"goal":false},{"x":0.8144,"y":0.265,"scored":false,"free":false,"goal":false},{"x":0.8669,"y":0.6653,"scored":false,"free":false,"goal":false},{"x":0.7271,"y":0.491,"scored":false,"free":false,"goal":false},{"x":0.7126,"y":0.2564,"scored":false,"free":false,"goal":false},{"x":0.9059,"y":0.5014,"scored":false,"free":false,"goal":false},{"x":0.8437,"y":0.5291,"scored":true,"free":false,"goal":false},{"x":0.7538,"y":0.3751,"scored":true,"free":false,"goal":false},{"x":0.8751,"y":0.254,"scored":false,"free":false,"goal":false},{"x":0.8947,"y":0.4068,"scored":false,"free":false,"goal":false},{"x":0.7627,"y":0.3368,"scored":true,"free":true,"goal":false},{"x":0.8411,"y":0.5375,"scored":true,"free":false,"goal":false},{"x":0.6981,"y":0.571,"scored":false,"free":false,"goal":false},{"x":0.6946,"y":0.4153,"scored":false,"free":true,"goal":false},{"x":0.5958,"y":0.7437,"scored":true,"free":true,"goal":false},{"x":0.8332,"y":0.6391,"scored":true,"free":false,"goal":false},{"x":0.617,"y":0.3872,"scored":true,"free":true,"goal":false},{"x":0.8333,"y":0.5013,"scored":false,"free":true,"goal":false},{"x":0.6685,"y":0.3872,"scored":false,"free":true,"goal":false}],"po_us":[{"x":0.5179,"y":0.7727,"won":false,"dist":"Short","side":"Right"},{"x":0.5242,"y":0.1924,"won":false,"dist":"Short","side":"Left"},{"x":0.6533,"y":0.8005,"won":false,"dist":"Mid","side":"Right"},{"x":0.8011,"y":0.5118,"won":true,"dist":"Long","side":"Centre"},{"x":0.5926,"y":0.4891,"won":false,"dist":"Short","side":"Centre"},{"x":0.5171,"y":0.8043,"won":true,"dist":"Short","side":"Right"},{"x":0.5188,"y":0.3853,"won":true,"dist":"Short","side":"Centre"},{"x":0.6375,"y":0.3349,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5542,"y":0.6358,"won":true,"dist":"Short","side":"Centre"},{"x":0.6399,"y":0.3326,"won":true,"dist":"Mid","side":"Centre"}],"po_opp":[{"x":0.7183,"y":0.8377,"won":true,"dist":"Long","side":"Right"},{"x":0.8443,"y":0.8092,"won":true,"dist":"Long","side":"Right"},{"x":0.7303,"y":0.2126,"won":true,"dist":"Long","side":"Left"},{"x":0.719,"y":0.2791,"won":true,"dist":"Long","side":"Left"},{"x":0.7073,"y":0.8317,"won":false,"dist":"Long","side":"Right"},{"x":0.7565,"y":0.2375,"won":true,"dist":"Long","side":"Left"},{"x":0.5015,"y":0.1431,"won":true,"dist":"Short","side":"Left"},{"x":0.5673,"y":0.2468,"won":false,"dist":"Short","side":"Left"},{"x":0.8755,"y":0.8896,"won":true,"dist":"Long","side":"Right"},{"x":0.5144,"y":0.368,"won":false,"dist":"Short","side":"Centre"},{"x":0.5349,"y":0.071,"won":false,"dist":"Short","side":"Left"},{"x":0.635,"y":0.0829,"won":true,"dist":"Mid","side":"Left"},{"x":0.6156,"y":0.7209,"won":true,"dist":"Mid","side":"Right"},{"x":0.5546,"y":0.0829,"won":true,"dist":"Short","side":"Left"},{"x":0.5509,"y":0.5725,"won":false,"dist":"Short","side":"Centre"},{"x":0.5911,"y":0.2705,"won":false,"dist":"Short","side":"Left"},{"x":0.5407,"y":0.1492,"won":false,"dist":"Short","side":"Left"},{"x":0.6096,"y":0.1556,"won":false,"dist":"Mid","side":"Left"},{"x":0.6107,"y":0.3169,"won":false,"dist":"Mid","side":"Left"},{"x":0.7304,"y":0.2478,"won":true,"dist":"Long","side":"Left"}]},{"opp":"Crokes","date":"15 Apr 2026","comp":"SFL","result":"W","rd":3,"jg":3,"jp":17,"jfg":3,"jfp":3,"og":0,"op":9,"jshots":34,"oshots":14,"jscored":20,"oscored":9,"jconv":59,"oconv":64,"jpl":32,"opl":0,"jpo_won":9,"jpo_total":16,"opo_won":12,"opo_total":24,"prod_us":9.2,"prod_opp":3.9,"scorers":[{"name":"Ellie Young","score":"3-03","frees":"(3g 1f)","tot":12},{"name":"Sin\u00e9ad Nolan","score":"0-05","frees":"(0g 2f)","tot":5},{"name":"Joye Atkinson","score":"0-03","frees":"","tot":3},{"name":"Caoimhe French","score":"0-02","frees":"","tot":2},{"name":"Alex Falvey","score":"0-01","frees":"","tot":1},{"name":"Emma Maher","score":"0-01","frees":"","tot":1},{"name":"Rachel Sheehan","score":"0-01","frees":"","tot":1},{"name":"Kate Aherne","score":"0-01","frees":"","tot":1}],"periods_us":[2,1,3,7,4,9],"periods_opp":[2,1,2,2,2,0],"shots_us":[{"x":0.8202,"y":0.5058,"scored":true,"free":false,"goal":false},{"x":0.8642,"y":0.367,"scored":true,"free":true,"goal":false},{"x":0.912,"y":0.6391,"scored":false,"free":false,"goal":false},{"x":0.7522,"y":0.7974,"scored":false,"free":false,"goal":false},{"x":0.7487,"y":0.3516,"scored":false,"free":false,"goal":false},{"x":0.8667,"y":0.316,"scored":true,"free":true,"goal":false},{"x":0.9259,"y":0.3944,"scored":false,"free":false,"goal":false},{"x":0.634,"y":0.4526,"scored":false,"free":false,"goal":false},{"x":0.7508,"y":0.5191,"scored":true,"free":false,"goal":false},{"x":0.8666,"y":0.2773,"scored":true,"free":false,"goal":false},{"x":0.931,"y":0.5242,"scored":false,"free":false,"goal":false},{"x":0.6979,"y":0.6367,"scored":true,"free":false,"goal":false},{"x":0.7494,"y":0.3969,"scored":true,"free":false,"goal":false},{"x":0.7989,"y":0.3162,"scored":true,"free":false,"goal":false},{"x":0.8693,"y":0.4921,"scored":false,"free":false,"goal":false},{"x":0.8913,"y":0.5082,"scored":false,"free":false,"goal":false},{"x":0.779,"y":0.2147,"scored":false,"free":false,"goal":false},{"x":0.7485,"y":0.6781,"scored":false,"free":false,"goal":false},{"x":0.7195,"y":0.2805,"scored":true,"free":false,"goal":false},{"x":0.7768,"y":0.6939,"scored":true,"free":false,"goal":false},{"x":0.5244,"y":0.6341,"scored":true,"free":true,"goal":true},{"x":0.6716,"y":0.6848,"scored":true,"free":true,"goal":false},{"x":0.8316,"y":0.2377,"scored":false,"free":false,"goal":false},{"x":0.6906,"y":0.2288,"scored":false,"free":false,"goal":false},{"x":0.8851,"y":0.8217,"scored":true,"free":false,"goal":false},{"x":0.7643,"y":0.4013,"scored":true,"free":false,"goal":false},{"x":0.78,"y":0.7815,"scored":true,"free":false,"goal":false},{"x":0.7481,"y":0.2684,"scored":false,"free":false,"goal":false},{"x":0.7404,"y":0.6948,"scored":true,"free":false,"goal":false},{"x":0.726,"y":0.4429,"scored":true,"free":false,"goal":false},{"x":0.6315,"y":0.5885,"scored":true,"free":true,"goal":true},{"x":0.7369,"y":0.3573,"scored":true,"free":false,"goal":false},{"x":0.8498,"y":0.5094,"scored":true,"free":true,"goal":true},{"x":0.6498,"y":0.4405,"scored":false,"free":false,"goal":false}],"shots_opp":[{"x":0.8048,"y":0.8302,"scored":true,"free":false,"goal":false},{"x":0.8382,"y":0.5075,"scored":true,"free":false,"goal":false},{"x":0.7971,"y":0.0924,"scored":true,"free":true,"goal":false},{"x":0.8565,"y":0.1886,"scored":false,"free":false,"goal":false},{"x":0.8508,"y":0.3989,"scored":true,"free":true,"goal":false},{"x":0.6906,"y":0.3631,"scored":false,"free":true,"goal":false},{"x":0.7438,"y":0.4206,"scored":true,"free":false,"goal":false},{"x":0.6922,"y":0.7247,"scored":false,"free":false,"goal":false},{"x":0.7866,"y":0.3112,"scored":true,"free":false,"goal":false},{"x":0.7212,"y":0.4363,"scored":false,"free":false,"goal":false},{"x":0.872,"y":0.8078,"scored":true,"free":false,"goal":false},{"x":0.6299,"y":0.588,"scored":true,"free":true,"goal":false},{"x":0.7918,"y":0.6371,"scored":true,"free":false,"goal":false},{"x":0.7852,"y":0.7068,"scored":false,"free":false,"goal":false}],"po_us":[{"x":0.5531,"y":0.8072,"won":false,"dist":"Short","side":"Right"},{"x":0.8371,"y":0.8124,"won":false,"dist":"Long","side":"Right"},{"x":0.5257,"y":0.5676,"won":true,"dist":"Short","side":"Centre"},{"x":0.7837,"y":0.3419,"won":true,"dist":"Long","side":"Centre"},{"x":0.6087,"y":0.224,"won":true,"dist":"Mid","side":"Left"},{"x":0.5532,"y":0.5629,"won":true,"dist":"Short","side":"Centre"},{"x":0.521,"y":0.7475,"won":false,"dist":"Short","side":"Right"},{"x":0.779,"y":0.7046,"won":true,"dist":"Long","side":"Right"},{"x":0.5235,"y":0.8068,"won":false,"dist":"Short","side":"Right"},{"x":0.5773,"y":0.6606,"won":true,"dist":"Short","side":"Right"},{"x":0.641,"y":0.2571,"won":true,"dist":"Mid","side":"Left"},{"x":0.7728,"y":0.2256,"won":true,"dist":"Long","side":"Left"},{"x":0.6975,"y":0.7138,"won":false,"dist":"Mid","side":"Right"},{"x":0.6003,"y":0.3395,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5778,"y":0.5215,"won":false,"dist":"Short","side":"Centre"},{"x":0.5283,"y":0.1781,"won":true,"dist":"Short","side":"Left"}],"po_opp":[{"x":0.6132,"y":0.6318,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5214,"y":0.1173,"won":true,"dist":"Short","side":"Left"},{"x":0.7355,"y":0.0618,"won":true,"dist":"Long","side":"Left"},{"x":0.6099,"y":0.7291,"won":false,"dist":"Mid","side":"Right"},{"x":0.6226,"y":0.3753,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5376,"y":0.1992,"won":true,"dist":"Short","side":"Left"},{"x":0.5257,"y":0.7253,"won":true,"dist":"Short","side":"Right"},{"x":0.5148,"y":0.3692,"won":true,"dist":"Short","side":"Centre"},{"x":0.5723,"y":0.3578,"won":false,"dist":"Short","side":"Centre"},{"x":0.675,"y":0.6948,"won":false,"dist":"Mid","side":"Right"},{"x":0.725,"y":0.7912,"won":true,"dist":"Long","side":"Right"},{"x":0.5161,"y":0.2573,"won":true,"dist":"Short","side":"Left"},{"x":0.5286,"y":0.2226,"won":false,"dist":"Short","side":"Left"},{"x":0.535,"y":0.2349,"won":true,"dist":"Short","side":"Left"},{"x":0.5163,"y":0.6788,"won":true,"dist":"Short","side":"Right"},{"x":0.5812,"y":0.2789,"won":false,"dist":"Short","side":"Left"},{"x":0.6293,"y":0.6741,"won":false,"dist":"Mid","side":"Right"},{"x":0.5299,"y":0.2983,"won":false,"dist":"Short","side":"Left"},{"x":0.6692,"y":0.3229,"won":true,"dist":"Mid","side":"Left"},{"x":0.655,"y":0.7007,"won":true,"dist":"Mid","side":"Right"},{"x":0.5955,"y":0.5427,"won":false,"dist":"Short","side":"Centre"},{"x":0.6182,"y":0.2266,"won":false,"dist":"Mid","side":"Left"},{"x":0.7586,"y":0.5094,"won":true,"dist":"Long","side":"Centre"},{"x":0.5164,"y":0.7686,"won":false,"dist":"Short","side":"Right"}]},{"opp":"Vincents","date":"30 Apr 2026","comp":"SFL","result":"D","rd":4,"jg":0,"jp":9,"jfg":0,"jfp":6,"og":0,"op":9,"jshots":17,"oshots":19,"jscored":9,"oscored":9,"jconv":53,"oconv":47,"jpl":26,"opl":0,"jpo_won":12,"jpo_total":18,"opo_won":7,"opo_total":12,"prod_us":5.2,"prod_opp":5.9,"scorers":[{"name":"Ellie Young","score":"0-05","frees":"(0g 4f)","tot":5},{"name":"Sin\u00e9ad Nolan","score":"0-02","frees":"(0g 2f)","tot":2},{"name":"Caoimhe French","score":"0-01","frees":"","tot":1},{"name":"Joye Atkinson","score":"0-01","frees":"","tot":1}],"periods_us":[1,2,0,3,1,2],"periods_opp":[2,0,1,2,2,2],"shots_us":[{"x":0.6548,"y":0.3612,"scored":false,"free":false,"goal":false},{"x":0.8567,"y":0.8684,"scored":true,"free":true,"goal":false},{"x":0.5014,"y":0.5118,"scored":false,"free":true,"goal":false},{"x":0.7286,"y":0.1233,"scored":false,"free":false,"goal":false},{"x":0.7943,"y":0.6212,"scored":true,"free":true,"goal":false},{"x":0.7869,"y":0.3952,"scored":true,"free":false,"goal":false},{"x":0.7591,"y":0.1923,"scored":false,"free":true,"goal":false},{"x":0.726,"y":0.6669,"scored":true,"free":false,"goal":false},{"x":0.8509,"y":0.19,"scored":true,"free":false,"goal":false},{"x":0.8522,"y":0.6474,"scored":true,"free":true,"goal":false},{"x":0.8696,"y":0.5396,"scored":false,"free":false,"goal":false},{"x":0.7007,"y":0.3728,"scored":true,"free":true,"goal":false},{"x":0.8608,"y":0.3753,"scored":false,"free":true,"goal":false},{"x":0.5756,"y":0.33,"scored":false,"free":true,"goal":false},{"x":0.7313,"y":0.603,"scored":true,"free":true,"goal":false},{"x":0.786,"y":0.7686,"scored":true,"free":true,"goal":false},{"x":0.6336,"y":0.4164,"scored":false,"free":false,"goal":false}],"shots_opp":[{"x":0.7384,"y":0.801,"scored":true,"free":false,"goal":false},{"x":0.5016,"y":0.5977,"scored":true,"free":true,"goal":false},{"x":0.8067,"y":0.6841,"scored":false,"free":false,"goal":false},{"x":0.5434,"y":0.4769,"scored":false,"free":true,"goal":false},{"x":0.7346,"y":0.5786,"scored":true,"free":true,"goal":false},{"x":0.7957,"y":0.7859,"scored":false,"free":false,"goal":false},{"x":0.778,"y":0.6152,"scored":false,"free":false,"goal":false},{"x":0.6913,"y":0.5108,"scored":false,"free":false,"goal":false},{"x":0.6805,"y":0.3828,"scored":true,"free":true,"goal":false},{"x":0.7643,"y":0.8826,"scored":true,"free":true,"goal":false},{"x":0.8146,"y":0.8385,"scored":false,"free":false,"goal":false},{"x":0.7608,"y":0.3172,"scored":false,"free":false,"goal":false},{"x":0.621,"y":0.4004,"scored":true,"free":false,"goal":false},{"x":0.8515,"y":0.6847,"scored":true,"free":false,"goal":false},{"x":0.7549,"y":0.7482,"scored":false,"free":false,"goal":false},{"x":0.6956,"y":0.6855,"scored":false,"free":false,"goal":false},{"x":0.7121,"y":0.6781,"scored":true,"free":true,"goal":false},{"x":0.8547,"y":0.7017,"scored":true,"free":true,"goal":false},{"x":0.7398,"y":0.2715,"scored":false,"free":true,"goal":false}],"po_us":[{"x":0.5143,"y":0.3235,"won":false,"dist":"Short","side":"Left"},{"x":0.7572,"y":0.9682,"won":false,"dist":"Long","side":"Right"},{"x":0.5071,"y":0.8452,"won":true,"dist":"Short","side":"Right"},{"x":0.8312,"y":0.7869,"won":true,"dist":"Long","side":"Right"},{"x":0.5238,"y":0.3218,"won":false,"dist":"Short","side":"Left"},{"x":0.7385,"y":0.7157,"won":true,"dist":"Long","side":"Right"},{"x":0.6199,"y":0.9666,"won":true,"dist":"Mid","side":"Right"},{"x":0.7409,"y":0.8799,"won":true,"dist":"Long","side":"Right"},{"x":0.5116,"y":0.5074,"won":true,"dist":"Short","side":"Centre"},{"x":0.5632,"y":0.338,"won":true,"dist":"Short","side":"Centre"},{"x":0.5505,"y":0.185,"won":true,"dist":"Short","side":"Left"},{"x":0.5273,"y":0.5692,"won":false,"dist":"Short","side":"Centre"},{"x":0.5207,"y":0.5251,"won":true,"dist":"Short","side":"Centre"},{"x":0.5544,"y":0.6767,"won":false,"dist":"Short","side":"Right"},{"x":0.5789,"y":0.3965,"won":true,"dist":"Short","side":"Centre"},{"x":0.5603,"y":0.6484,"won":false,"dist":"Short","side":"Centre"},{"x":0.7563,"y":0.2205,"won":true,"dist":"Long","side":"Left"},{"x":0.5795,"y":0.347,"won":true,"dist":"Short","side":"Centre"}],"po_opp":[{"x":0.8313,"y":0.9067,"won":true,"dist":"Long","side":"Right"},{"x":0.7631,"y":0.4536,"won":true,"dist":"Long","side":"Centre"},{"x":0.5046,"y":0.7479,"won":true,"dist":"Short","side":"Right"},{"x":0.7432,"y":0.5981,"won":true,"dist":"Long","side":"Centre"},{"x":0.5093,"y":0.6995,"won":false,"dist":"Short","side":"Right"},{"x":0.5632,"y":0.3574,"won":true,"dist":"Short","side":"Centre"},{"x":0.5085,"y":0.2825,"won":false,"dist":"Short","side":"Left"},{"x":0.6642,"y":0.7309,"won":false,"dist":"Mid","side":"Right"},{"x":0.5786,"y":0.1674,"won":true,"dist":"Short","side":"Left"},{"x":0.5958,"y":0.8718,"won":false,"dist":"Short","side":"Right"},{"x":0.5287,"y":0.7266,"won":false,"dist":"Short","side":"Right"},{"x":0.5763,"y":0.2839,"won":true,"dist":"Short","side":"Left"}]},{"opp":"Boden","date":"07 May 2026","comp":"AFL","result":"L","rd":5,"jg":1,"jp":11,"jfg":1,"jfp":3,"og":2,"op":11,"jshots":27,"oshots":34,"jscored":12,"oscored":13,"jconv":44,"oconv":38,"jpl":31,"opl":0,"jpo_won":11,"jpo_total":21,"opo_won":11,"opo_total":21,"prod_us":5.2,"prod_opp":6.7,"scorers":[{"name":"Ellie Young","score":"1-03","frees":"(1g 3f)","tot":6},{"name":"Caoimhe French","score":"0-03","frees":"","tot":3},{"name":"Joye Atkinson","score":"0-02","frees":"","tot":2},{"name":"Millie Farrelly","score":"0-01","frees":"","tot":1},{"name":"Sin\u00e9ad Nolan","score":"0-01","frees":"","tot":1},{"name":"Rachel Sheehan","score":"0-01","frees":"","tot":1}],"periods_us":[3,4,0,1,2,4],"periods_opp":[4,2,1,5,1,4],"shots_us":[{"x":0.6964,"y":0.6617,"scored":true,"free":false,"goal":false},{"x":0.7041,"y":0.7843,"scored":true,"free":false,"goal":false},{"x":0.9037,"y":0.5404,"scored":false,"free":false,"goal":false},{"x":0.9,"y":0.53,"scored":false,"free":false,"goal":false},{"x":0.7188,"y":0.7085,"scored":false,"free":false,"goal":false},{"x":0.6843,"y":0.552,"scored":false,"free":false,"goal":false},{"x":0.6585,"y":0.6272,"scored":false,"free":false,"goal":false},{"x":0.7056,"y":0.5396,"scored":true,"free":false,"goal":false},{"x":0.8531,"y":0.4792,"scored":true,"free":true,"goal":true},{"x":0.8425,"y":0.6855,"scored":true,"free":false,"goal":false},{"x":0.754,"y":0.5892,"scored":false,"free":false,"goal":false},{"x":0.7003,"y":0.3955,"scored":false,"free":false,"goal":false},{"x":0.8987,"y":0.3682,"scored":false,"free":false,"goal":false},{"x":0.7629,"y":0.6107,"scored":false,"free":false,"goal":false},{"x":0.6973,"y":0.1008,"scored":true,"free":true,"goal":false},{"x":0.7063,"y":0.0785,"scored":true,"free":true,"goal":false},{"x":0.7416,"y":0.6145,"scored":true,"free":false,"goal":false},{"x":0.7491,"y":0.6512,"scored":false,"free":false,"goal":false},{"x":0.7353,"y":0.6741,"scored":false,"free":false,"goal":false},{"x":0.808,"y":0.8245,"scored":false,"free":false,"goal":false},{"x":0.8944,"y":0.8867,"scored":false,"free":false,"goal":false},{"x":0.7517,"y":0.3356,"scored":true,"free":false,"goal":false},{"x":0.7468,"y":0.6904,"scored":false,"free":false,"goal":false},{"x":0.8664,"y":0.5165,"scored":true,"free":true,"goal":false},{"x":0.7472,"y":0.5379,"scored":false,"free":false,"goal":false},{"x":0.8286,"y":0.7411,"scored":true,"free":false,"goal":false},{"x":0.8643,"y":0.3169,"scored":true,"free":false,"goal":false}],"shots_opp":[{"x":0.7601,"y":0.2706,"scored":true,"free":false,"goal":false},{"x":0.7468,"y":0.4684,"scored":true,"free":false,"goal":false},{"x":0.6647,"y":0.2018,"scored":false,"free":true,"goal":false},{"x":0.8563,"y":0.4964,"scored":false,"free":false,"goal":false},{"x":0.6768,"y":0.3838,"scored":false,"free":false,"goal":false},{"x":0.6972,"y":0.4963,"scored":true,"free":false,"goal":false},{"x":0.7801,"y":0.6462,"scored":true,"free":false,"goal":false},{"x":0.6272,"y":0.6965,"scored":true,"free":true,"goal":false},{"x":0.6761,"y":0.6401,"scored":true,"free":false,"goal":false},{"x":0.7478,"y":0.2268,"scored":false,"free":true,"goal":false},{"x":0.8751,"y":0.4999,"scored":false,"free":false,"goal":false},{"x":0.8649,"y":0.7031,"scored":false,"free":false,"goal":false},{"x":0.7426,"y":0.2665,"scored":false,"free":false,"goal":false},{"x":0.7542,"y":0.1827,"scored":true,"free":true,"goal":false},{"x":0.6687,"y":0.5201,"scored":false,"free":false,"goal":false},{"x":0.7342,"y":0.1012,"scored":false,"free":false,"goal":false},{"x":0.5556,"y":0.7411,"scored":false,"free":true,"goal":false},{"x":0.8234,"y":0.6797,"scored":false,"free":false,"goal":false},{"x":0.7221,"y":0.4122,"scored":false,"free":false,"goal":false},{"x":0.8622,"y":0.765,"scored":false,"free":false,"goal":false},{"x":0.6989,"y":0.4633,"scored":true,"free":true,"goal":false},{"x":0.841,"y":0.5095,"scored":false,"free":false,"goal":false},{"x":0.9024,"y":0.5666,"scored":true,"free":false,"goal":true},{"x":0.7827,"y":0.43,"scored":false,"free":false,"goal":false},{"x":0.7525,"y":0.5938,"scored":true,"free":true,"goal":false},{"x":0.8405,"y":0.5057,"scored":false,"free":false,"goal":false},{"x":0.7007,"y":0.5185,"scored":false,"free":true,"goal":false},{"x":0.817,"y":0.535,"scored":false,"free":false,"goal":false},{"x":0.8453,"y":0.2126,"scored":false,"free":false,"goal":false},{"x":0.7021,"y":0.5975,"scored":true,"free":true,"goal":false},{"x":0.9013,"y":0.4305,"scored":false,"free":false,"goal":false},{"x":0.7746,"y":0.6616,"scored":true,"free":true,"goal":false},{"x":0.6979,"y":0.6451,"scored":false,"free":false,"goal":false},{"x":0.9598,"y":0.5145,"scored":true,"free":false,"goal":true}],"po_us":[{"x":0.6012,"y":0.1334,"won":false,"dist":"Mid","side":"Left"},{"x":0.7796,"y":0.2561,"won":true,"dist":"Long","side":"Left"},{"x":0.5644,"y":0.5569,"won":true,"dist":"Short","side":"Centre"},{"x":0.8164,"y":0.8755,"won":false,"dist":"Long","side":"Right"},{"x":0.5051,"y":0.4415,"won":true,"dist":"Short","side":"Centre"},{"x":0.8272,"y":0.8433,"won":true,"dist":"Long","side":"Right"},{"x":0.5046,"y":0.707,"won":false,"dist":"Short","side":"Right"},{"x":0.6151,"y":0.5927,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5235,"y":0.4643,"won":false,"dist":"Short","side":"Centre"},{"x":0.525,"y":0.7934,"won":true,"dist":"Short","side":"Right"},{"x":0.6511,"y":0.7942,"won":true,"dist":"Mid","side":"Right"},{"x":0.5204,"y":0.5856,"won":false,"dist":"Short","side":"Centre"},{"x":0.5341,"y":0.6449,"won":false,"dist":"Short","side":"Centre"},{"x":0.5411,"y":0.3421,"won":false,"dist":"Short","side":"Centre"},{"x":0.6086,"y":0.1934,"won":true,"dist":"Mid","side":"Left"},{"x":0.5833,"y":0.2896,"won":true,"dist":"Short","side":"Left"},{"x":0.5231,"y":0.7615,"won":true,"dist":"Short","side":"Right"},{"x":0.646,"y":0.5025,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5045,"y":0.816,"won":false,"dist":"Short","side":"Right"},{"x":0.5348,"y":0.209,"won":false,"dist":"Short","side":"Left"},{"x":0.5303,"y":0.3437,"won":false,"dist":"Short","side":"Centre"}],"po_opp":[{"x":0.5078,"y":0.1843,"won":false,"dist":"Short","side":"Left"},{"x":0.6276,"y":0.65,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6934,"y":0.7911,"won":true,"dist":"Mid","side":"Right"},{"x":0.5886,"y":0.3109,"won":true,"dist":"Short","side":"Left"},{"x":0.5845,"y":0.3891,"won":false,"dist":"Short","side":"Centre"},{"x":0.5004,"y":0.8915,"won":true,"dist":"Short","side":"Right"},{"x":0.6259,"y":0.7328,"won":true,"dist":"Mid","side":"Right"},{"x":0.5894,"y":0.0447,"won":false,"dist":"Short","side":"Left"},{"x":0.7286,"y":0.8371,"won":true,"dist":"Long","side":"Right"},{"x":0.5936,"y":0.9529,"won":true,"dist":"Short","side":"Right"},{"x":0.5457,"y":0.7771,"won":false,"dist":"Short","side":"Right"},{"x":0.5361,"y":0.6104,"won":true,"dist":"Short","side":"Centre"},{"x":0.6181,"y":0.8173,"won":true,"dist":"Mid","side":"Right"},{"x":0.533,"y":0.0165,"won":false,"dist":"Short","side":"Left"},{"x":0.5655,"y":0.8701,"won":true,"dist":"Short","side":"Right"},{"x":0.5193,"y":0.5175,"won":false,"dist":"Short","side":"Centre"},{"x":0.5281,"y":0.2251,"won":false,"dist":"Short","side":"Left"},{"x":0.6174,"y":0.2639,"won":true,"dist":"Mid","side":"Left"},{"x":0.6233,"y":0.0291,"won":false,"dist":"Mid","side":"Left"},{"x":0.5996,"y":0.7995,"won":false,"dist":"Short","side":"Right"},{"x":0.5561,"y":0.8756,"won":false,"dist":"Short","side":"Right"}]},{"opp":"Kildare","date":"10 May 2026","comp":"Challenge","result":"L","rd":6,"jg":3,"jp":8,"jfg":1,"jfp":4,"og":1,"op":15,"jshots":21,"oshots":37,"jscored":11,"oscored":16,"jconv":52,"oconv":43,"jpl":18,"opl":0,"jpo_won":9,"jpo_total":24,"opo_won":13,"opo_total":18,"prod_us":4.1,"prod_opp":7.3,"scorers":[{"name":"Ellie Young","score":"1-04","frees":"(1g 4f)","tot":7},{"name":"Joye Atkinson","score":"1-03","frees":"","tot":6},{"name":"Millie Farrelly","score":"1-00","frees":"","tot":3},{"name":"Caoimhe French","score":"0-01","frees":"","tot":1}],"periods_us":[2,2,3,3,4,3],"periods_opp":[1,1,4,5,3,4],"shots_us":[{"x":0.6907,"y":0.5806,"scored":true,"free":false,"goal":false},{"x":0.7366,"y":0.3718,"scored":true,"free":false,"goal":false},{"x":0.7268,"y":0.7885,"scored":false,"free":false,"goal":false},{"x":0.6564,"y":0.6472,"scored":true,"free":false,"goal":false},{"x":0.7401,"y":0.7748,"scored":false,"free":false,"goal":false},{"x":0.7828,"y":0.7472,"scored":true,"free":true,"goal":false},{"x":0.8352,"y":0.6927,"scored":false,"free":false,"goal":false},{"x":0.9213,"y":0.686,"scored":false,"free":false,"goal":false},{"x":0.9127,"y":0.5048,"scored":true,"free":false,"goal":true},{"x":0.7839,"y":0.3573,"scored":false,"free":false,"goal":false},{"x":0.7596,"y":0.2543,"scored":false,"free":false,"goal":false},{"x":0.8313,"y":0.5058,"scored":true,"free":true,"goal":true},{"x":0.6742,"y":0.772,"scored":false,"free":false,"goal":false},{"x":0.8398,"y":0.8658,"scored":false,"free":false,"goal":false},{"x":0.675,"y":0.6296,"scored":true,"free":true,"goal":false},{"x":0.5432,"y":0.3668,"scored":true,"free":false,"goal":true},{"x":0.6891,"y":0.5404,"scored":true,"free":true,"goal":false},{"x":0.796,"y":0.7983,"scored":false,"free":false,"goal":false},{"x":0.8026,"y":0.4405,"scored":true,"free":false,"goal":false},{"x":0.688,"y":0.0496,"scored":false,"free":true,"goal":false},{"x":0.6868,"y":0.0823,"scored":true,"free":true,"goal":false}],"shots_opp":[{"x":0.5476,"y":0.6829,"scored":false,"free":true,"goal":false},{"x":0.9067,"y":0.6568,"scored":true,"free":false,"goal":false},{"x":0.7449,"y":0.218,"scored":false,"free":false,"goal":false},{"x":0.7419,"y":0.5583,"scored":false,"free":true,"goal":false},{"x":0.6859,"y":0.0921,"scored":false,"free":true,"goal":false},{"x":0.7921,"y":0.3431,"scored":false,"free":false,"goal":false},{"x":0.878,"y":0.8171,"scored":false,"free":false,"goal":false},{"x":0.5447,"y":0.3333,"scored":false,"free":true,"goal":false},{"x":0.8088,"y":0.1925,"scored":false,"free":false,"goal":false},{"x":0.5999,"y":0.3636,"scored":false,"free":true,"goal":false},{"x":0.8044,"y":0.2644,"scored":true,"free":false,"goal":false},{"x":0.6039,"y":0.5596,"scored":true,"free":false,"goal":false},{"x":0.6874,"y":0.9145,"scored":true,"free":true,"goal":false},{"x":0.7945,"y":0.7057,"scored":true,"free":false,"goal":false},{"x":0.7798,"y":0.3132,"scored":true,"free":false,"goal":false},{"x":0.7181,"y":0.2993,"scored":false,"free":false,"goal":false},{"x":0.7501,"y":0.6437,"scored":true,"free":true,"goal":false},{"x":0.8965,"y":0.4383,"scored":false,"free":false,"goal":false},{"x":0.8691,"y":0.506,"scored":true,"free":true,"goal":false},{"x":0.9068,"y":0.3013,"scored":true,"free":false,"goal":false},{"x":0.7612,"y":0.2406,"scored":true,"free":false,"goal":false},{"x":0.5063,"y":0.7367,"scored":false,"free":true,"goal":false},{"x":0.6961,"y":0.4313,"scored":true,"free":true,"goal":false},{"x":0.7562,"y":0.4573,"scored":true,"free":true,"goal":false},{"x":0.9471,"y":0.309,"scored":false,"free":false,"goal":false},{"x":0.842,"y":0.7711,"scored":false,"free":false,"goal":false},{"x":0.7062,"y":0.5081,"scored":false,"free":false,"goal":false},{"x":0.694,"y":0.3871,"scored":true,"free":true,"goal":false},{"x":0.9006,"y":0.4777,"scored":true,"free":false,"goal":false},{"x":0.8783,"y":0.5346,"scored":false,"free":false,"goal":false},{"x":0.9267,"y":0.385,"scored":true,"free":false,"goal":true},{"x":0.9204,"y":0.4811,"scored":false,"free":false,"goal":false},{"x":0.8451,"y":0.5118,"scored":false,"free":false,"goal":false},{"x":0.9135,"y":0.4793,"scored":true,"free":false,"goal":false},{"x":0.6961,"y":0.6124,"scored":false,"free":false,"goal":false},{"x":0.9623,"y":0.5286,"scored":false,"free":false,"goal":false},{"x":0.8319,"y":0.2708,"scored":false,"free":false,"goal":false}],"po_us":[{"x":0.6101,"y":0.1912,"won":false,"dist":"Mid","side":"Left"},{"x":0.6551,"y":0.0873,"won":false,"dist":"Mid","side":"Left"},{"x":0.59,"y":0.7435,"won":false,"dist":"Short","side":"Right"},{"x":0.5143,"y":0.454,"won":true,"dist":"Short","side":"Centre"},{"x":0.5378,"y":0.3846,"won":true,"dist":"Short","side":"Centre"},{"x":0.5581,"y":0.295,"won":false,"dist":"Short","side":"Left"},{"x":0.5348,"y":0.2783,"won":false,"dist":"Short","side":"Left"},{"x":0.5248,"y":0.3668,"won":false,"dist":"Short","side":"Centre"},{"x":0.5382,"y":0.1057,"won":false,"dist":"Short","side":"Left"},{"x":0.539,"y":0.1783,"won":false,"dist":"Short","side":"Left"},{"x":0.5407,"y":0.2742,"won":true,"dist":"Short","side":"Left"},{"x":0.5367,"y":0.6091,"won":false,"dist":"Short","side":"Centre"},{"x":0.578,"y":0.7779,"won":false,"dist":"Short","side":"Right"},{"x":0.5278,"y":0.4408,"won":true,"dist":"Short","side":"Centre"},{"x":0.514,"y":0.3265,"won":true,"dist":"Short","side":"Left"},{"x":0.649,"y":0.7851,"won":true,"dist":"Mid","side":"Right"},{"x":0.7282,"y":0.7932,"won":true,"dist":"Long","side":"Right"},{"x":0.5116,"y":0.2821,"won":false,"dist":"Short","side":"Left"},{"x":0.5778,"y":0.7964,"won":false,"dist":"Short","side":"Right"},{"x":0.607,"y":0.5536,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5818,"y":0.6967,"won":false,"dist":"Short","side":"Right"},{"x":0.5237,"y":0.5904,"won":false,"dist":"Short","side":"Centre"},{"x":0.5985,"y":0.6284,"won":true,"dist":"Short","side":"Centre"},{"x":0.501,"y":0.3444,"won":false,"dist":"Short","side":"Centre"}],"po_opp":[{"x":0.5524,"y":0.7095,"won":true,"dist":"Short","side":"Right"},{"x":0.6217,"y":0.1423,"won":false,"dist":"Mid","side":"Left"},{"x":0.5843,"y":0.7457,"won":true,"dist":"Short","side":"Right"},{"x":0.6186,"y":0.3775,"won":false,"dist":"Mid","side":"Centre"},{"x":0.7865,"y":0.7742,"won":true,"dist":"Long","side":"Right"},{"x":0.5386,"y":0.2062,"won":true,"dist":"Short","side":"Left"},{"x":0.6825,"y":0.285,"won":true,"dist":"Mid","side":"Left"},{"x":0.8093,"y":0.4763,"won":true,"dist":"Long","side":"Centre"},{"x":0.5271,"y":0.7637,"won":true,"dist":"Short","side":"Right"},{"x":0.5492,"y":0.7125,"won":true,"dist":"Short","side":"Right"},{"x":0.5735,"y":0.8128,"won":true,"dist":"Short","side":"Right"},{"x":0.512,"y":0.6771,"won":false,"dist":"Short","side":"Right"},{"x":0.5439,"y":0.9479,"won":true,"dist":"Short","side":"Right"},{"x":0.7004,"y":0.6318,"won":true,"dist":"Long","side":"Centre"},{"x":0.7008,"y":0.2203,"won":true,"dist":"Long","side":"Left"},{"x":0.552,"y":0.837,"won":false,"dist":"Short","side":"Right"},{"x":0.5598,"y":0.9208,"won":true,"dist":"Short","side":"Right"},{"x":0.5063,"y":0.9336,"won":false,"dist":"Short","side":"Right"}]},{"opp":"Lucan","date":"03 Jun 2026","comp":"SFL","result":"W","rd":7,"jg":3,"jp":16,"jfg":0,"jfp":3,"og":0,"op":7,"jshots":40,"oshots":17,"jscored":19,"oscored":7,"jconv":48,"oconv":41,"jpl":34,"opl":0,"jpo_won":5,"jpo_total":14,"opo_won":6,"opo_total":29,"prod_us":8.7,"prod_opp":3.8,"scorers":[{"name":"Ellie Young","score":"1-07","frees":"(0g 3f)","tot":10},{"name":"Lauren Kearney","score":"0-04","frees":"","tot":4},{"name":"Joye Atkinson","score":"0-04","frees":"","tot":4},{"name":"Caoimhe French","score":"1-00","frees":"","tot":3},{"name":"Emma Cloake","score":"1-00","frees":"","tot":3},{"name":"Sin\u00e9ad Nolan","score":"0-01","frees":"","tot":1}],"periods_us":[2,6,3,1,7,6],"periods_opp":[0,0,0,4,1,2],"shots_us":[{"x":0.7239,"y":0.4961,"scored":true,"free":true,"goal":false},{"x":0.7264,"y":0.487,"scored":true,"free":false,"goal":false},{"x":0.678,"y":0.7213,"scored":false,"free":false,"goal":false},{"x":0.7706,"y":0.2532,"scored":true,"free":true,"goal":false},{"x":0.6018,"y":0.7743,"scored":false,"free":false,"goal":false},{"x":0.7708,"y":0.6926,"scored":true,"free":false,"goal":false},{"x":0.7306,"y":0.7837,"scored":false,"free":false,"goal":false},{"x":0.7062,"y":0.8672,"scored":false,"free":false,"goal":false},{"x":0.8689,"y":0.4328,"scored":false,"free":false,"goal":false},{"x":0.9325,"y":0.4066,"scored":true,"free":false,"goal":true},{"x":0.8962,"y":0.3338,"scored":false,"free":false,"goal":false},{"x":0.7128,"y":0.7805,"scored":false,"free":false,"goal":false},{"x":0.5328,"y":0.5164,"scored":false,"free":true,"goal":false},{"x":0.8037,"y":0.1674,"scored":false,"free":false,"goal":false},{"x":0.8703,"y":0.6807,"scored":false,"free":false,"goal":false},{"x":0.8178,"y":0.6878,"scored":false,"free":false,"goal":false},{"x":0.699,"y":0.4835,"scored":true,"free":false,"goal":false},{"x":0.8277,"y":0.7505,"scored":true,"free":false,"goal":false},{"x":0.8336,"y":0.7214,"scored":false,"free":false,"goal":false},{"x":0.6974,"y":0.6816,"scored":false,"free":false,"goal":false},{"x":0.8005,"y":0.7196,"scored":false,"free":false,"goal":false},{"x":0.7424,"y":0.7288,"scored":true,"free":false,"goal":false},{"x":0.6885,"y":0.5524,"scored":true,"free":false,"goal":false},{"x":0.7172,"y":0.07,"scored":false,"free":false,"goal":false},{"x":0.7701,"y":0.3573,"scored":true,"free":false,"goal":false},{"x":0.7907,"y":0.5878,"scored":false,"free":false,"goal":false},{"x":0.7735,"y":0.3362,"scored":true,"free":false,"goal":false},{"x":0.8887,"y":0.3647,"scored":true,"free":false,"goal":true},{"x":0.8924,"y":0.7839,"scored":true,"free":false,"goal":false},{"x":0.7967,"y":0.6532,"scored":true,"free":false,"goal":false},{"x":0.7564,"y":0.2231,"scored":false,"free":false,"goal":false},{"x":0.8104,"y":0.4892,"scored":false,"free":false,"goal":false},{"x":0.8453,"y":0.5047,"scored":false,"free":false,"goal":false},{"x":0.7575,"y":0.305,"scored":true,"free":false,"goal":false},{"x":0.7904,"y":0.7498,"scored":false,"free":false,"goal":false},{"x":0.6946,"y":0.4868,"scored":true,"free":false,"goal":false},{"x":0.6479,"y":0.3086,"scored":true,"free":false,"goal":false},{"x":0.6886,"y":0.3701,"scored":false,"free":false,"goal":false},{"x":0.9179,"y":0.4155,"scored":true,"free":false,"goal":true},{"x":0.6919,"y":0.2832,"scored":true,"free":true,"goal":false}],"shots_opp":[{"x":0.5801,"y":0.6888,"scored":false,"free":true,"goal":false},{"x":0.7359,"y":0.3136,"scored":false,"free":false,"goal":false},{"x":0.8051,"y":0.7827,"scored":false,"free":false,"goal":false},{"x":0.6248,"y":0.6651,"scored":false,"free":true,"goal":false},{"x":0.698,"y":0.511,"scored":true,"free":false,"goal":false},{"x":0.8033,"y":0.3468,"scored":true,"free":true,"goal":false},{"x":0.6907,"y":0.7222,"scored":false,"free":false,"goal":false},{"x":0.7468,"y":0.7342,"scored":true,"free":true,"goal":false},{"x":0.7605,"y":0.2745,"scored":true,"free":true,"goal":false},{"x":0.8113,"y":0.7961,"scored":false,"free":false,"goal":false},{"x":0.7005,"y":0.4787,"scored":true,"free":true,"goal":false},{"x":0.689,"y":0.4074,"scored":false,"free":false,"goal":false},{"x":0.6835,"y":0.2981,"scored":false,"free":true,"goal":false},{"x":0.7282,"y":0.5049,"scored":false,"free":true,"goal":false},{"x":0.7694,"y":0.4633,"scored":true,"free":false,"goal":false},{"x":0.5591,"y":0.4371,"scored":false,"free":false,"goal":false},{"x":0.7851,"y":0.5132,"scored":true,"free":false,"goal":false}],"po_us":[{"x":0.6458,"y":0.4668,"won":false,"dist":"Mid","side":"Centre"},{"x":0.8676,"y":0.3849,"won":true,"dist":"Long","side":"Centre"},{"x":0.524,"y":0.2064,"won":false,"dist":"Short","side":"Left"},{"x":0.5323,"y":0.7152,"won":true,"dist":"Short","side":"Right"},{"x":0.5276,"y":0.6746,"won":true,"dist":"Short","side":"Right"},{"x":0.505,"y":0.2234,"won":false,"dist":"Short","side":"Left"},{"x":0.696,"y":0.7411,"won":false,"dist":"Mid","side":"Right"},{"x":0.5391,"y":0.7605,"won":false,"dist":"Short","side":"Right"},{"x":0.5139,"y":0.2622,"won":true,"dist":"Short","side":"Left"},{"x":0.5001,"y":0.8631,"won":false,"dist":"Short","side":"Right"},{"x":0.6035,"y":0.3031,"won":false,"dist":"Mid","side":"Left"},{"x":0.5613,"y":0.1631,"won":false,"dist":"Short","side":"Left"},{"x":0.5845,"y":0.4178,"won":false,"dist":"Short","side":"Centre"},{"x":0.5061,"y":0.7915,"won":true,"dist":"Short","side":"Right"}],"po_opp":[{"x":0.646,"y":0.7983,"won":true,"dist":"Mid","side":"Right"},{"x":0.6807,"y":0.5726,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6702,"y":0.2877,"won":true,"dist":"Mid","side":"Left"},{"x":0.6059,"y":0.7996,"won":false,"dist":"Mid","side":"Right"},{"x":0.5442,"y":0.7957,"won":false,"dist":"Short","side":"Right"},{"x":0.5231,"y":0.7003,"won":false,"dist":"Short","side":"Right"},{"x":0.674,"y":0.8613,"won":false,"dist":"Mid","side":"Right"},{"x":0.5377,"y":0.5215,"won":false,"dist":"Short","side":"Centre"},{"x":0.6683,"y":0.5643,"won":false,"dist":"Mid","side":"Centre"},{"x":0.6919,"y":0.2518,"won":false,"dist":"Mid","side":"Left"},{"x":0.6672,"y":0.6855,"won":false,"dist":"Mid","side":"Right"},{"x":0.6278,"y":0.4169,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5756,"y":0.5916,"won":false,"dist":"Short","side":"Centre"},{"x":0.5098,"y":0.2195,"won":false,"dist":"Short","side":"Left"},{"x":0.5279,"y":0.5047,"won":false,"dist":"Short","side":"Centre"},{"x":0.6294,"y":0.6437,"won":false,"dist":"Mid","side":"Centre"},{"x":0.591,"y":0.6583,"won":false,"dist":"Short","side":"Centre"},{"x":0.5422,"y":0.8463,"won":false,"dist":"Short","side":"Right"},{"x":0.511,"y":0.2996,"won":false,"dist":"Short","side":"Left"},{"x":0.53,"y":0.3625,"won":false,"dist":"Short","side":"Centre"},{"x":0.5908,"y":0.8026,"won":false,"dist":"Short","side":"Right"},{"x":0.5024,"y":0.543,"won":true,"dist":"Short","side":"Centre"},{"x":0.6066,"y":0.5408,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5979,"y":0.8066,"won":false,"dist":"Short","side":"Right"},{"x":0.5552,"y":0.305,"won":false,"dist":"Short","side":"Left"},{"x":0.5397,"y":0.4781,"won":false,"dist":"Short","side":"Centre"},{"x":0.5291,"y":0.1534,"won":false,"dist":"Short","side":"Left"},{"x":0.7141,"y":0.5748,"won":true,"dist":"Long","side":"Centre"},{"x":0.6456,"y":0.1825,"won":false,"dist":"Mid","side":"Left"}]},{"opp":"Na Fianna","date":"11 Jun 2026","comp":"SFL","result":"W","rd":8,"jg":0,"jp":13,"jfg":0,"jfp":6,"og":1,"op":9,"jshots":34,"oshots":16,"jscored":13,"oscored":10,"jconv":38,"oconv":62,"jpl":25,"opl":0,"jpo_won":8,"jpo_total":13,"opo_won":15,"opo_total":23,"prod_us":8.9,"prod_opp":4.3,"scorers":[{"name":"Ellie Young","score":"0-07","frees":"(0g 6f)","tot":7},{"name":"Joye Atkinson","score":"0-02","frees":"","tot":2},{"name":"Caoimhe French","score":"0-02","frees":"","tot":2},{"name":"Sin\u00e9ad Nolan","score":"0-01","frees":"","tot":1},{"name":"Lauren Kearney","score":"0-01","frees":"","tot":1}],"periods_us":[2,0,0,3,5,3],"periods_opp":[3,1,2,5,0,1],"shots_us":[{"x":0.8439,"y":0.9577,"scored":false,"free":true,"goal":false},{"x":0.722,"y":0.8125,"scored":false,"free":false,"goal":false},{"x":0.7317,"y":0.835,"scored":true,"free":false,"goal":false},{"x":0.7805,"y":0.1603,"scored":true,"free":false,"goal":false},{"x":0.6918,"y":0.4799,"scored":false,"free":false,"goal":false},{"x":0.7943,"y":0.8744,"scored":false,"free":false,"goal":false},{"x":0.77,"y":0.6914,"scored":false,"free":false,"goal":false},{"x":0.716,"y":0.9492,"scored":false,"free":false,"goal":false},{"x":0.9327,"y":0.2328,"scored":false,"free":false,"goal":false},{"x":0.6788,"y":0.5251,"scored":false,"free":false,"goal":false},{"x":0.7028,"y":0.6605,"scored":false,"free":false,"goal":false},{"x":0.5417,"y":0.7323,"scored":false,"free":true,"goal":false},{"x":0.6449,"y":0.6165,"scored":true,"free":false,"goal":false},{"x":0.6481,"y":0.6912,"scored":false,"free":false,"goal":false},{"x":0.7493,"y":0.2255,"scored":false,"free":false,"goal":false},{"x":0.8796,"y":0.4868,"scored":false,"free":false,"goal":false},{"x":0.6628,"y":0.5089,"scored":true,"free":true,"goal":false},{"x":0.7716,"y":0.8302,"scored":false,"free":false,"goal":false},{"x":0.8311,"y":0.4452,"scored":true,"free":false,"goal":false},{"x":0.7621,"y":0.469,"scored":true,"free":false,"goal":false},{"x":0.834,"y":0.5759,"scored":true,"free":true,"goal":false},{"x":0.7305,"y":0.4987,"scored":false,"free":false,"goal":false},{"x":0.7577,"y":0.5106,"scored":true,"free":true,"goal":false},{"x":0.8508,"y":0.147,"scored":true,"free":true,"goal":false},{"x":0.8082,"y":0.6711,"scored":true,"free":true,"goal":false},{"x":0.7519,"y":0.7406,"scored":false,"free":true,"goal":false},{"x":0.7344,"y":0.6306,"scored":true,"free":false,"goal":false},{"x":0.7471,"y":0.1185,"scored":false,"free":true,"goal":false},{"x":0.9066,"y":0.7993,"scored":false,"free":false,"goal":false},{"x":0.7269,"y":0.5106,"scored":false,"free":false,"goal":false},{"x":0.5766,"y":0.5712,"scored":false,"free":false,"goal":false},{"x":0.693,"y":0.4357,"scored":false,"free":false,"goal":false},{"x":0.7426,"y":0.2694,"scored":true,"free":false,"goal":false},{"x":0.5154,"y":0.4512,"scored":true,"free":true,"goal":false}],"shots_opp":[{"x":0.8141,"y":0.4963,"scored":true,"free":false,"goal":false},{"x":0.7428,"y":0.3524,"scored":true,"free":false,"goal":false},{"x":0.7515,"y":0.3268,"scored":false,"free":true,"goal":false},{"x":0.8012,"y":0.36,"scored":true,"free":true,"goal":false},{"x":0.747,"y":0.7031,"scored":true,"free":true,"goal":false},{"x":0.8066,"y":0.8607,"scored":true,"free":true,"goal":false},{"x":0.9133,"y":0.6639,"scored":false,"free":false,"goal":false},{"x":0.8793,"y":0.3953,"scored":false,"free":false,"goal":false},{"x":0.8122,"y":0.4678,"scored":true,"free":false,"goal":false},{"x":0.7556,"y":0.1428,"scored":false,"free":true,"goal":false},{"x":0.9164,"y":0.5334,"scored":true,"free":false,"goal":true},{"x":0.7354,"y":0.2972,"scored":true,"free":true,"goal":false},{"x":0.7865,"y":0.1543,"scored":true,"free":false,"goal":false},{"x":0.8102,"y":0.2003,"scored":true,"free":true,"goal":false},{"x":0.7524,"y":0.8475,"scored":false,"free":false,"goal":false},{"x":0.6492,"y":0.4771,"scored":false,"free":false,"goal":false}],"po_us":[{"x":0.5718,"y":0.7235,"won":false,"dist":"Short","side":"Right"},{"x":0.542,"y":0.1555,"won":true,"dist":"Short","side":"Left"},{"x":0.554,"y":0.2539,"won":true,"dist":"Short","side":"Left"},{"x":0.5045,"y":0.5177,"won":true,"dist":"Short","side":"Centre"},{"x":0.5702,"y":0.5179,"won":false,"dist":"Short","side":"Centre"},{"x":0.7303,"y":0.2784,"won":true,"dist":"Long","side":"Left"},{"x":0.5997,"y":0.3765,"won":true,"dist":"Short","side":"Centre"},{"x":0.5043,"y":0.6462,"won":false,"dist":"Short","side":"Centre"},{"x":0.8805,"y":0.2031,"won":true,"dist":"Long","side":"Left"},{"x":0.5153,"y":0.4953,"won":false,"dist":"Short","side":"Centre"},{"x":0.6704,"y":0.3623,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5053,"y":0.291,"won":false,"dist":"Short","side":"Left"},{"x":0.7544,"y":0.4953,"won":true,"dist":"Long","side":"Centre"}],"po_opp":[{"x":0.5796,"y":0.3456,"won":true,"dist":"Short","side":"Centre"},{"x":0.5211,"y":0.7696,"won":true,"dist":"Short","side":"Right"},{"x":0.548,"y":0.8361,"won":false,"dist":"Short","side":"Right"},{"x":0.5065,"y":0.21,"won":true,"dist":"Short","side":"Left"},{"x":0.5264,"y":0.1553,"won":true,"dist":"Short","side":"Left"},{"x":0.5211,"y":0.8352,"won":true,"dist":"Short","side":"Right"},{"x":0.508,"y":0.6805,"won":false,"dist":"Short","side":"Right"},{"x":0.7844,"y":0.8243,"won":true,"dist":"Long","side":"Right"},{"x":0.5165,"y":0.1851,"won":true,"dist":"Short","side":"Left"},{"x":0.5351,"y":0.8304,"won":false,"dist":"Short","side":"Right"},{"x":0.5312,"y":0.5094,"won":false,"dist":"Short","side":"Centre"},{"x":0.5644,"y":0.2682,"won":false,"dist":"Short","side":"Left"},{"x":0.5897,"y":0.9896,"won":false,"dist":"Short","side":"Right"},{"x":0.7138,"y":0.6619,"won":false,"dist":"Long","side":"Right"},{"x":0.5692,"y":0.8392,"won":true,"dist":"Short","side":"Right"},{"x":0.666,"y":0.5819,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5604,"y":0.5642,"won":true,"dist":"Short","side":"Centre"},{"x":0.628,"y":0.1549,"won":true,"dist":"Mid","side":"Left"},{"x":0.5496,"y":0.6284,"won":true,"dist":"Short","side":"Centre"},{"x":0.6549,"y":0.5174,"won":false,"dist":"Mid","side":"Centre"},{"x":0.8403,"y":0.4991,"won":true,"dist":"Long","side":"Centre"},{"x":0.8079,"y":0.1684,"won":true,"dist":"Long","side":"Left"},{"x":0.6008,"y":0.4191,"won":true,"dist":"Mid","side":"Centre"}]}],"seasonScorers":[{"name":"Ellie Young","score":"6-35","frees":"(5g 24f)","tot":53,"mp":8,"g":6,"p":35,"fg":5,"fp":24},{"name":"Joye Atkinson","score":"3-16","frees":"","tot":25,"mp":7,"g":3,"p":16,"fg":0,"fp":0},{"name":"Sin\u00e9ad Nolan","score":"0-15","frees":"(0g 9f)","tot":15,"mp":7,"g":0,"p":15,"fg":0,"fp":9},{"name":"Caoimhe French","score":"1-10","frees":"","tot":13,"mp":7,"g":1,"p":10,"fg":0,"fp":0},{"name":"Lauren Kearney","score":"0-08","frees":"","tot":8,"mp":4,"g":0,"p":8,"fg":0,"fp":0},{"name":"Millie Farrelly","score":"1-01","frees":"","tot":4,"mp":2,"g":1,"p":1,"fg":0,"fp":0},{"name":"Emma Cloake","score":"1-00","frees":"","tot":3,"mp":1,"g":1,"p":0,"fg":0,"fp":0},{"name":"Alex Falvey","score":"0-02","frees":"","tot":2,"mp":2,"g":0,"p":2,"fg":0,"fp":0},{"name":"Rachel Sheehan","score":"0-02","frees":"","tot":2,"mp":2,"g":0,"p":2,"fg":0,"fp":0},{"name":"Roisin Connolly","score":"0-01","frees":"","tot":1,"mp":1,"g":0,"p":1,"fg":0,"fp":0},{"name":"Emma Maher","score":"0-01","frees":"","tot":1,"mp":1,"g":0,"p":1,"fg":0,"fp":0},{"name":"Kate Aherne","score":"0-01","frees":"","tot":1,"mp":1,"g":0,"p":1,"fg":0,"fp":0}],"seasonContacts":[{"name":"Laura Kilkoyne","count":26,"mp":7,"pg":3.7},{"name":"Niamh Russel","count":22,"mp":6,"pg":3.7},{"name":"Caoimhe French","count":19,"mp":5,"pg":3.8},{"name":"Alex Falvey","count":17,"mp":6,"pg":2.8},{"name":"Eimear O Riordan","count":15,"mp":5,"pg":3.0},{"name":"Emma Maher","count":15,"mp":6,"pg":2.5},{"name":"Rachel Sheehan","count":14,"mp":5,"pg":2.8},{"name":"Liadh murray","count":12,"mp":6,"pg":2.0},{"name":"Lauren Kearney","count":11,"mp":6,"pg":1.8},{"name":"Joye Atkinson","count":11,"mp":5,"pg":2.2},{"name":"Niamh Doherty","count":10,"mp":6,"pg":1.7},{"name":"Sin\u00e9ad Nolan","count":9,"mp":5,"pg":1.8},{"name":"Kate Aherne","count":8,"mp":3,"pg":2.7},{"name":"Millie Farrelly","count":8,"mp":5,"pg":1.6},{"name":"Hannah Hegarty","count":8,"mp":2,"pg":4.0},{"name":"Ellie Young","count":7,"mp":6,"pg":1.2},{"name":"Eve Keegan","count":6,"mp":4,"pg":1.5},{"name":"\u00c9ile Caffrey","count":6,"mp":2,"pg":3.0},{"name":"Caitriona Dev","count":4,"mp":1,"pg":4.0},{"name":"Caoimhe Begley","count":3,"mp":1,"pg":3.0},{"name":"Isabelle Gilleran","count":2,"mp":1,"pg":2.0},{"name":"Caoimhe Begleye","count":2,"mp":1,"pg":2.0},{"name":"Nessa Wardick","count":1,"mp":1,"pg":1.0},{"name":"Roisin Connolly","count":1,"mp":1,"pg":1.0},{"name":"Katie Fitzgerald","count":1,"mp":1,"pg":1.0}],"seasonCompare":[{"label":"Total shots","us":224,"opp":179,"lower_better":false},{"label":"Scores from play","us":66,"opp":41,"lower_better":false},{"label":"Scores from frees","us":38,"opp":35,"lower_better":false},{"label":"Shot conversion %","us":46,"opp":42,"lower_better":false},{"label":"Own PO retention %","us":50,"opp":50,"lower_better":false},{"label":"Turnovers lost","us":209,"opp":0,"lower_better":true}],"seasonShotsUs":[{"x":0.7237,"y":0.5305,"scored":true,"free":false,"goal":false},{"x":0.7671,"y":0.7693,"scored":true,"free":false,"goal":false},{"x":0.8572,"y":0.4129,"scored":false,"free":false,"goal":false},{"x":0.6909,"y":0.7902,"scored":false,"free":false,"goal":false},{"x":0.7799,"y":0.3413,"scored":false,"free":false,"goal":false},{"x":0.7707,"y":0.9257,"scored":false,"free":false,"goal":false},{"x":0.5298,"y":0.3442,"scored":false,"free":false,"goal":false},{"x":0.7203,"y":0.647,"scored":false,"free":false,"goal":false},{"x":0.7488,"y":0.4749,"scored":true,"free":true,"goal":false},{"x":0.7029,"y":0.4868,"scored":true,"free":false,"goal":false},{"x":0.5348,"y":0.4547,"scored":false,"free":true,"goal":false},{"x":0.793,"y":0.6081,"scored":false,"free":false,"goal":false},{"x":0.8762,"y":0.3919,"scored":false,"free":false,"goal":false},{"x":0.7532,"y":0.4538,"scored":false,"free":false,"goal":false},{"x":0.6769,"y":0.3492,"scored":false,"free":false,"goal":false},{"x":0.9151,"y":0.3338,"scored":false,"free":false,"goal":false},{"x":0.6825,"y":0.3896,"scored":true,"free":true,"goal":false},{"x":0.7669,"y":0.7045,"scored":true,"free":true,"goal":false},{"x":0.8186,"y":0.2625,"scored":false,"free":false,"goal":false},{"x":0.7514,"y":0.5999,"scored":true,"free":false,"goal":false},{"x":0.7177,"y":0.6809,"scored":false,"free":false,"goal":false},{"x":0.7216,"y":0.7152,"scored":true,"free":true,"goal":false},{"x":0.7955,"y":0.3929,"scored":false,"free":true,"goal":false},{"x":0.9059,"y":0.4108,"scored":false,"free":false,"goal":false},{"x":0.8605,"y":0.7438,"scored":false,"free":false,"goal":false},{"x":0.8989,"y":0.3322,"scored":true,"free":false,"goal":false},{"x":0.7033,"y":0.5132,"scored":false,"free":false,"goal":false},{"x":0.9356,"y":0.6221,"scored":false,"free":false,"goal":false},{"x":0.6898,"y":0.531,"scored":true,"free":false,"goal":false},{"x":0.9266,"y":0.3713,"scored":false,"free":false,"goal":false},{"x":0.7109,"y":0.1757,"scored":false,"free":false,"goal":false},{"x":0.8565,"y":0.7311,"scored":false,"free":false,"goal":false},{"x":0.865,"y":0.2577,"scored":false,"free":false,"goal":false},{"x":0.6623,"y":0.392,"scored":true,"free":true,"goal":false},{"x":0.8087,"y":0.5748,"scored":true,"free":true,"goal":false},{"x":0.8264,"y":0.6199,"scored":true,"free":true,"goal":false},{"x":0.8587,"y":0.466,"scored":false,"free":false,"goal":false},{"x":0.882,"y":0.3494,"scored":false,"free":false,"goal":false},{"x":0.7101,"y":0.4802,"scored":false,"free":false,"goal":false},{"x":0.935,"y":0.4561,"scored":true,"free":false,"goal":true},{"x":0.7361,"y":0.686,"scored":false,"free":false,"goal":false},{"x":0.8545,"y":0.7155,"scored":false,"free":false,"goal":false},{"x":0.7413,"y":0.6864,"scored":true,"free":false,"goal":false},{"x":0.7859,"y":0.6301,"scored":true,"free":false,"goal":false},{"x":0.8903,"y":0.4358,"scored":true,"free":false,"goal":true},{"x":0.8337,"y":0.7209,"scored":true,"free":false,"goal":false},{"x":0.7015,"y":0.6033,"scored":false,"free":false,"goal":false},{"x":0.7185,"y":0.6224,"scored":false,"free":true,"goal":false},{"x":0.7091,"y":0.2016,"scored":true,"free":true,"goal":false},{"x":0.7055,"y":0.6488,"scored":true,"free":false,"goal":false},{"x":0.7759,"y":0.3368,"scored":false,"free":false,"goal":false},{"x":0.8202,"y":0.5058,"scored":true,"free":false,"goal":false},{"x":0.8642,"y":0.367,"scored":true,"free":true,"goal":false},{"x":0.912,"y":0.6391,"scored":false,"free":false,"goal":false},{"x":0.7522,"y":0.7974,"scored":false,"free":false,"goal":false},{"x":0.7487,"y":0.3516,"scored":false,"free":false,"goal":false},{"x":0.8667,"y":0.316,"scored":true,"free":true,"goal":false},{"x":0.9259,"y":0.3944,"scored":false,"free":false,"goal":false},{"x":0.634,"y":0.4526,"scored":false,"free":false,"goal":false},{"x":0.7508,"y":0.5191,"scored":true,"free":false,"goal":false},{"x":0.8666,"y":0.2773,"scored":true,"free":false,"goal":false},{"x":0.931,"y":0.5242,"scored":false,"free":false,"goal":false},{"x":0.6979,"y":0.6367,"scored":true,"free":false,"goal":false},{"x":0.7494,"y":0.3969,"scored":true,"free":false,"goal":false},{"x":0.7989,"y":0.3162,"scored":true,"free":false,"goal":false},{"x":0.8693,"y":0.4921,"scored":false,"free":false,"goal":false},{"x":0.8913,"y":0.5082,"scored":false,"free":false,"goal":false},{"x":0.779,"y":0.2147,"scored":false,"free":false,"goal":false},{"x":0.7485,"y":0.6781,"scored":false,"free":false,"goal":false},{"x":0.7195,"y":0.2805,"scored":true,"free":false,"goal":false},{"x":0.7768,"y":0.6939,"scored":true,"free":false,"goal":false},{"x":0.5244,"y":0.6341,"scored":true,"free":true,"goal":true},{"x":0.6716,"y":0.6848,"scored":true,"free":true,"goal":false},{"x":0.8316,"y":0.2377,"scored":false,"free":false,"goal":false},{"x":0.6906,"y":0.2288,"scored":false,"free":false,"goal":false},{"x":0.8851,"y":0.8217,"scored":true,"free":false,"goal":false},{"x":0.7643,"y":0.4013,"scored":true,"free":false,"goal":false},{"x":0.78,"y":0.7815,"scored":true,"free":false,"goal":false},{"x":0.7481,"y":0.2684,"scored":false,"free":false,"goal":false},{"x":0.7404,"y":0.6948,"scored":true,"free":false,"goal":false},{"x":0.726,"y":0.4429,"scored":true,"free":false,"goal":false},{"x":0.6315,"y":0.5885,"scored":true,"free":true,"goal":true},{"x":0.7369,"y":0.3573,"scored":true,"free":false,"goal":false},{"x":0.8498,"y":0.5094,"scored":true,"free":true,"goal":true},{"x":0.6498,"y":0.4405,"scored":false,"free":false,"goal":false},{"x":0.6548,"y":0.3612,"scored":false,"free":false,"goal":false},{"x":0.8567,"y":0.8684,"scored":true,"free":true,"goal":false},{"x":0.5014,"y":0.5118,"scored":false,"free":true,"goal":false},{"x":0.7286,"y":0.1233,"scored":false,"free":false,"goal":false},{"x":0.7943,"y":0.6212,"scored":true,"free":true,"goal":false},{"x":0.7869,"y":0.3952,"scored":true,"free":false,"goal":false},{"x":0.7591,"y":0.1923,"scored":false,"free":true,"goal":false},{"x":0.726,"y":0.6669,"scored":true,"free":false,"goal":false},{"x":0.8509,"y":0.19,"scored":true,"free":false,"goal":false},{"x":0.8522,"y":0.6474,"scored":true,"free":true,"goal":false},{"x":0.8696,"y":0.5396,"scored":false,"free":false,"goal":false},{"x":0.7007,"y":0.3728,"scored":true,"free":true,"goal":false},{"x":0.8608,"y":0.3753,"scored":false,"free":true,"goal":false},{"x":0.5756,"y":0.33,"scored":false,"free":true,"goal":false},{"x":0.7313,"y":0.603,"scored":true,"free":true,"goal":false},{"x":0.786,"y":0.7686,"scored":true,"free":true,"goal":false},{"x":0.6336,"y":0.4164,"scored":false,"free":false,"goal":false},{"x":0.6964,"y":0.6617,"scored":true,"free":false,"goal":false},{"x":0.7041,"y":0.7843,"scored":true,"free":false,"goal":false},{"x":0.9037,"y":0.5404,"scored":false,"free":false,"goal":false},{"x":0.9,"y":0.53,"scored":false,"free":false,"goal":false},{"x":0.7188,"y":0.7085,"scored":false,"free":false,"goal":false},{"x":0.6843,"y":0.552,"scored":false,"free":false,"goal":false},{"x":0.6585,"y":0.6272,"scored":false,"free":false,"goal":false},{"x":0.7056,"y":0.5396,"scored":true,"free":false,"goal":false},{"x":0.8531,"y":0.4792,"scored":true,"free":true,"goal":true},{"x":0.8425,"y":0.6855,"scored":true,"free":false,"goal":false},{"x":0.754,"y":0.5892,"scored":false,"free":false,"goal":false},{"x":0.7003,"y":0.3955,"scored":false,"free":false,"goal":false},{"x":0.8987,"y":0.3682,"scored":false,"free":false,"goal":false},{"x":0.7629,"y":0.6107,"scored":false,"free":false,"goal":false},{"x":0.6973,"y":0.1008,"scored":true,"free":true,"goal":false},{"x":0.7063,"y":0.0785,"scored":true,"free":true,"goal":false},{"x":0.7416,"y":0.6145,"scored":true,"free":false,"goal":false},{"x":0.7491,"y":0.6512,"scored":false,"free":false,"goal":false},{"x":0.7353,"y":0.6741,"scored":false,"free":false,"goal":false},{"x":0.808,"y":0.8245,"scored":false,"free":false,"goal":false},{"x":0.8944,"y":0.8867,"scored":false,"free":false,"goal":false},{"x":0.7517,"y":0.3356,"scored":true,"free":false,"goal":false},{"x":0.7468,"y":0.6904,"scored":false,"free":false,"goal":false},{"x":0.8664,"y":0.5165,"scored":true,"free":true,"goal":false},{"x":0.7472,"y":0.5379,"scored":false,"free":false,"goal":false},{"x":0.8286,"y":0.7411,"scored":true,"free":false,"goal":false},{"x":0.8643,"y":0.3169,"scored":true,"free":false,"goal":false},{"x":0.6907,"y":0.5806,"scored":true,"free":false,"goal":false},{"x":0.7366,"y":0.3718,"scored":true,"free":false,"goal":false},{"x":0.7268,"y":0.7885,"scored":false,"free":false,"goal":false},{"x":0.6564,"y":0.6472,"scored":true,"free":false,"goal":false},{"x":0.7401,"y":0.7748,"scored":false,"free":false,"goal":false},{"x":0.7828,"y":0.7472,"scored":true,"free":true,"goal":false},{"x":0.8352,"y":0.6927,"scored":false,"free":false,"goal":false},{"x":0.9213,"y":0.686,"scored":false,"free":false,"goal":false},{"x":0.9127,"y":0.5048,"scored":true,"free":false,"goal":true},{"x":0.7839,"y":0.3573,"scored":false,"free":false,"goal":false},{"x":0.7596,"y":0.2543,"scored":false,"free":false,"goal":false},{"x":0.8313,"y":0.5058,"scored":true,"free":true,"goal":true},{"x":0.6742,"y":0.772,"scored":false,"free":false,"goal":false},{"x":0.8398,"y":0.8658,"scored":false,"free":false,"goal":false},{"x":0.675,"y":0.6296,"scored":true,"free":true,"goal":false},{"x":0.5432,"y":0.3668,"scored":true,"free":false,"goal":true},{"x":0.6891,"y":0.5404,"scored":true,"free":true,"goal":false},{"x":0.796,"y":0.7983,"scored":false,"free":false,"goal":false},{"x":0.8026,"y":0.4405,"scored":true,"free":false,"goal":false},{"x":0.688,"y":0.0496,"scored":false,"free":true,"goal":false},{"x":0.6868,"y":0.0823,"scored":true,"free":true,"goal":false},{"x":0.7239,"y":0.4961,"scored":true,"free":true,"goal":false},{"x":0.7264,"y":0.487,"scored":true,"free":false,"goal":false},{"x":0.678,"y":0.7213,"scored":false,"free":false,"goal":false},{"x":0.7706,"y":0.2532,"scored":true,"free":true,"goal":false},{"x":0.6018,"y":0.7743,"scored":false,"free":false,"goal":false},{"x":0.7708,"y":0.6926,"scored":true,"free":false,"goal":false},{"x":0.7306,"y":0.7837,"scored":false,"free":false,"goal":false},{"x":0.7062,"y":0.8672,"scored":false,"free":false,"goal":false},{"x":0.8689,"y":0.4328,"scored":false,"free":false,"goal":false},{"x":0.9325,"y":0.4066,"scored":true,"free":false,"goal":true},{"x":0.8962,"y":0.3338,"scored":false,"free":false,"goal":false},{"x":0.7128,"y":0.7805,"scored":false,"free":false,"goal":false},{"x":0.5328,"y":0.5164,"scored":false,"free":true,"goal":false},{"x":0.8037,"y":0.1674,"scored":false,"free":false,"goal":false},{"x":0.8703,"y":0.6807,"scored":false,"free":false,"goal":false},{"x":0.8178,"y":0.6878,"scored":false,"free":false,"goal":false},{"x":0.699,"y":0.4835,"scored":true,"free":false,"goal":false},{"x":0.8277,"y":0.7505,"scored":true,"free":false,"goal":false},{"x":0.8336,"y":0.7214,"scored":false,"free":false,"goal":false},{"x":0.6974,"y":0.6816,"scored":false,"free":false,"goal":false},{"x":0.8005,"y":0.7196,"scored":false,"free":false,"goal":false},{"x":0.7424,"y":0.7288,"scored":true,"free":false,"goal":false},{"x":0.6885,"y":0.5524,"scored":true,"free":false,"goal":false},{"x":0.7172,"y":0.07,"scored":false,"free":false,"goal":false},{"x":0.7701,"y":0.3573,"scored":true,"free":false,"goal":false},{"x":0.7907,"y":0.5878,"scored":false,"free":false,"goal":false},{"x":0.7735,"y":0.3362,"scored":true,"free":false,"goal":false},{"x":0.8887,"y":0.3647,"scored":true,"free":false,"goal":true},{"x":0.8924,"y":0.7839,"scored":true,"free":false,"goal":false},{"x":0.7967,"y":0.6532,"scored":true,"free":false,"goal":false},{"x":0.7564,"y":0.2231,"scored":false,"free":false,"goal":false},{"x":0.8104,"y":0.4892,"scored":false,"free":false,"goal":false},{"x":0.8453,"y":0.5047,"scored":false,"free":false,"goal":false},{"x":0.7575,"y":0.305,"scored":true,"free":false,"goal":false},{"x":0.7904,"y":0.7498,"scored":false,"free":false,"goal":false},{"x":0.6946,"y":0.4868,"scored":true,"free":false,"goal":false},{"x":0.6479,"y":0.3086,"scored":true,"free":false,"goal":false},{"x":0.6886,"y":0.3701,"scored":false,"free":false,"goal":false},{"x":0.9179,"y":0.4155,"scored":true,"free":false,"goal":true},{"x":0.6919,"y":0.2832,"scored":true,"free":true,"goal":false},{"x":0.8439,"y":0.9577,"scored":false,"free":true,"goal":false},{"x":0.722,"y":0.8125,"scored":false,"free":false,"goal":false},{"x":0.7317,"y":0.835,"scored":true,"free":false,"goal":false},{"x":0.7805,"y":0.1603,"scored":true,"free":false,"goal":false},{"x":0.6918,"y":0.4799,"scored":false,"free":false,"goal":false},{"x":0.7943,"y":0.8744,"scored":false,"free":false,"goal":false},{"x":0.77,"y":0.6914,"scored":false,"free":false,"goal":false},{"x":0.716,"y":0.9492,"scored":false,"free":false,"goal":false},{"x":0.9327,"y":0.2328,"scored":false,"free":false,"goal":false},{"x":0.6788,"y":0.5251,"scored":false,"free":false,"goal":false},{"x":0.7028,"y":0.6605,"scored":false,"free":false,"goal":false},{"x":0.5417,"y":0.7323,"scored":false,"free":true,"goal":false},{"x":0.6449,"y":0.6165,"scored":true,"free":false,"goal":false},{"x":0.6481,"y":0.6912,"scored":false,"free":false,"goal":false},{"x":0.7493,"y":0.2255,"scored":false,"free":false,"goal":false},{"x":0.8796,"y":0.4868,"scored":false,"free":false,"goal":false},{"x":0.6628,"y":0.5089,"scored":true,"free":true,"goal":false},{"x":0.7716,"y":0.8302,"scored":false,"free":false,"goal":false},{"x":0.8311,"y":0.4452,"scored":true,"free":false,"goal":false},{"x":0.7621,"y":0.469,"scored":true,"free":false,"goal":false},{"x":0.834,"y":0.5759,"scored":true,"free":true,"goal":false},{"x":0.7305,"y":0.4987,"scored":false,"free":false,"goal":false},{"x":0.7577,"y":0.5106,"scored":true,"free":true,"goal":false},{"x":0.8508,"y":0.147,"scored":true,"free":true,"goal":false},{"x":0.8082,"y":0.6711,"scored":true,"free":true,"goal":false},{"x":0.7519,"y":0.7406,"scored":false,"free":true,"goal":false},{"x":0.7344,"y":0.6306,"scored":true,"free":false,"goal":false},{"x":0.7471,"y":0.1185,"scored":false,"free":true,"goal":false},{"x":0.9066,"y":0.7993,"scored":false,"free":false,"goal":false},{"x":0.7269,"y":0.5106,"scored":false,"free":false,"goal":false},{"x":0.5766,"y":0.5712,"scored":false,"free":false,"goal":false},{"x":0.693,"y":0.4357,"scored":false,"free":false,"goal":false},{"x":0.7426,"y":0.2694,"scored":true,"free":false,"goal":false},{"x":0.5154,"y":0.4512,"scored":true,"free":true,"goal":false}],"seasonShotsOpp":[{"x":0.8259,"y":0.7104,"scored":false,"free":false,"goal":false},{"x":0.5743,"y":0.3551,"scored":false,"free":true,"goal":false},{"x":0.6561,"y":0.3538,"scored":false,"free":true,"goal":false},{"x":0.8549,"y":0.7743,"scored":false,"free":true,"goal":false},{"x":0.7225,"y":0.4252,"scored":true,"free":false,"goal":false},{"x":0.6404,"y":0.7556,"scored":false,"free":true,"goal":false},{"x":0.7203,"y":0.5903,"scored":false,"free":false,"goal":false},{"x":0.8121,"y":0.7406,"scored":true,"free":false,"goal":false},{"x":0.8664,"y":0.6434,"scored":false,"free":false,"goal":false},{"x":0.8636,"y":0.6703,"scored":true,"free":true,"goal":false},{"x":0.7554,"y":0.3804,"scored":false,"free":false,"goal":false},{"x":0.7501,"y":0.4162,"scored":false,"free":true,"goal":false},{"x":0.6666,"y":0.6225,"scored":false,"free":true,"goal":false},{"x":0.719,"y":0.9255,"scored":false,"free":true,"goal":false},{"x":0.6884,"y":0.3578,"scored":false,"free":false,"goal":false},{"x":0.8653,"y":0.349,"scored":false,"free":false,"goal":false},{"x":0.6553,"y":0.4322,"scored":false,"free":false,"goal":false},{"x":0.7318,"y":0.499,"scored":true,"free":true,"goal":false},{"x":0.6998,"y":0.1957,"scored":false,"free":true,"goal":false},{"x":0.6725,"y":0.2302,"scored":false,"free":true,"goal":false},{"x":0.7632,"y":0.5985,"scored":true,"free":false,"goal":false},{"x":0.7053,"y":0.2741,"scored":false,"free":false,"goal":false},{"x":0.7024,"y":0.4393,"scored":false,"free":false,"goal":false},{"x":0.6923,"y":0.7211,"scored":false,"free":true,"goal":false},{"x":0.8144,"y":0.265,"scored":false,"free":false,"goal":false},{"x":0.8669,"y":0.6653,"scored":false,"free":false,"goal":false},{"x":0.7271,"y":0.491,"scored":false,"free":false,"goal":false},{"x":0.7126,"y":0.2564,"scored":false,"free":false,"goal":false},{"x":0.9059,"y":0.5014,"scored":false,"free":false,"goal":false},{"x":0.8437,"y":0.5291,"scored":true,"free":false,"goal":false},{"x":0.7538,"y":0.3751,"scored":true,"free":false,"goal":false},{"x":0.8751,"y":0.254,"scored":false,"free":false,"goal":false},{"x":0.8947,"y":0.4068,"scored":false,"free":false,"goal":false},{"x":0.7627,"y":0.3368,"scored":true,"free":true,"goal":false},{"x":0.8411,"y":0.5375,"scored":true,"free":false,"goal":false},{"x":0.6981,"y":0.571,"scored":false,"free":false,"goal":false},{"x":0.6946,"y":0.4153,"scored":false,"free":true,"goal":false},{"x":0.5958,"y":0.7437,"scored":true,"free":true,"goal":false},{"x":0.8332,"y":0.6391,"scored":true,"free":false,"goal":false},{"x":0.617,"y":0.3872,"scored":true,"free":true,"goal":false},{"x":0.8333,"y":0.5013,"scored":false,"free":true,"goal":false},{"x":0.6685,"y":0.3872,"scored":false,"free":true,"goal":false},{"x":0.8048,"y":0.8302,"scored":true,"free":false,"goal":false},{"x":0.8382,"y":0.5075,"scored":true,"free":false,"goal":false},{"x":0.7971,"y":0.0924,"scored":true,"free":true,"goal":false},{"x":0.8565,"y":0.1886,"scored":false,"free":false,"goal":false},{"x":0.8508,"y":0.3989,"scored":true,"free":true,"goal":false},{"x":0.6906,"y":0.3631,"scored":false,"free":true,"goal":false},{"x":0.7438,"y":0.4206,"scored":true,"free":false,"goal":false},{"x":0.6922,"y":0.7247,"scored":false,"free":false,"goal":false},{"x":0.7866,"y":0.3112,"scored":true,"free":false,"goal":false},{"x":0.7212,"y":0.4363,"scored":false,"free":false,"goal":false},{"x":0.872,"y":0.8078,"scored":true,"free":false,"goal":false},{"x":0.6299,"y":0.588,"scored":true,"free":true,"goal":false},{"x":0.7918,"y":0.6371,"scored":true,"free":false,"goal":false},{"x":0.7852,"y":0.7068,"scored":false,"free":false,"goal":false},{"x":0.7384,"y":0.801,"scored":true,"free":false,"goal":false},{"x":0.5016,"y":0.5977,"scored":true,"free":true,"goal":false},{"x":0.8067,"y":0.6841,"scored":false,"free":false,"goal":false},{"x":0.5434,"y":0.4769,"scored":false,"free":true,"goal":false},{"x":0.7346,"y":0.5786,"scored":true,"free":true,"goal":false},{"x":0.7957,"y":0.7859,"scored":false,"free":false,"goal":false},{"x":0.778,"y":0.6152,"scored":false,"free":false,"goal":false},{"x":0.6913,"y":0.5108,"scored":false,"free":false,"goal":false},{"x":0.6805,"y":0.3828,"scored":true,"free":true,"goal":false},{"x":0.7643,"y":0.8826,"scored":true,"free":true,"goal":false},{"x":0.8146,"y":0.8385,"scored":false,"free":false,"goal":false},{"x":0.7608,"y":0.3172,"scored":false,"free":false,"goal":false},{"x":0.621,"y":0.4004,"scored":true,"free":false,"goal":false},{"x":0.8515,"y":0.6847,"scored":true,"free":false,"goal":false},{"x":0.7549,"y":0.7482,"scored":false,"free":false,"goal":false},{"x":0.6956,"y":0.6855,"scored":false,"free":false,"goal":false},{"x":0.7121,"y":0.6781,"scored":true,"free":true,"goal":false},{"x":0.8547,"y":0.7017,"scored":true,"free":true,"goal":false},{"x":0.7398,"y":0.2715,"scored":false,"free":true,"goal":false},{"x":0.7601,"y":0.2706,"scored":true,"free":false,"goal":false},{"x":0.7468,"y":0.4684,"scored":true,"free":false,"goal":false},{"x":0.6647,"y":0.2018,"scored":false,"free":true,"goal":false},{"x":0.8563,"y":0.4964,"scored":false,"free":false,"goal":false},{"x":0.6768,"y":0.3838,"scored":false,"free":false,"goal":false},{"x":0.6972,"y":0.4963,"scored":true,"free":false,"goal":false},{"x":0.7801,"y":0.6462,"scored":true,"free":false,"goal":false},{"x":0.6272,"y":0.6965,"scored":true,"free":true,"goal":false},{"x":0.6761,"y":0.6401,"scored":true,"free":false,"goal":false},{"x":0.7478,"y":0.2268,"scored":false,"free":true,"goal":false},{"x":0.8751,"y":0.4999,"scored":false,"free":false,"goal":false},{"x":0.8649,"y":0.7031,"scored":false,"free":false,"goal":false},{"x":0.7426,"y":0.2665,"scored":false,"free":false,"goal":false},{"x":0.7542,"y":0.1827,"scored":true,"free":true,"goal":false},{"x":0.6687,"y":0.5201,"scored":false,"free":false,"goal":false},{"x":0.7342,"y":0.1012,"scored":false,"free":false,"goal":false},{"x":0.5556,"y":0.7411,"scored":false,"free":true,"goal":false},{"x":0.8234,"y":0.6797,"scored":false,"free":false,"goal":false},{"x":0.7221,"y":0.4122,"scored":false,"free":false,"goal":false},{"x":0.8622,"y":0.765,"scored":false,"free":false,"goal":false},{"x":0.6989,"y":0.4633,"scored":true,"free":true,"goal":false},{"x":0.841,"y":0.5095,"scored":false,"free":false,"goal":false},{"x":0.9024,"y":0.5666,"scored":true,"free":false,"goal":true},{"x":0.7827,"y":0.43,"scored":false,"free":false,"goal":false},{"x":0.7525,"y":0.5938,"scored":true,"free":true,"goal":false},{"x":0.8405,"y":0.5057,"scored":false,"free":false,"goal":false},{"x":0.7007,"y":0.5185,"scored":false,"free":true,"goal":false},{"x":0.817,"y":0.535,"scored":false,"free":false,"goal":false},{"x":0.8453,"y":0.2126,"scored":false,"free":false,"goal":false},{"x":0.7021,"y":0.5975,"scored":true,"free":true,"goal":false},{"x":0.9013,"y":0.4305,"scored":false,"free":false,"goal":false},{"x":0.7746,"y":0.6616,"scored":true,"free":true,"goal":false},{"x":0.6979,"y":0.6451,"scored":false,"free":false,"goal":false},{"x":0.9598,"y":0.5145,"scored":true,"free":false,"goal":true},{"x":0.5476,"y":0.6829,"scored":false,"free":true,"goal":false},{"x":0.9067,"y":0.6568,"scored":true,"free":false,"goal":false},{"x":0.7449,"y":0.218,"scored":false,"free":false,"goal":false},{"x":0.7419,"y":0.5583,"scored":false,"free":true,"goal":false},{"x":0.6859,"y":0.0921,"scored":false,"free":true,"goal":false},{"x":0.7921,"y":0.3431,"scored":false,"free":false,"goal":false},{"x":0.878,"y":0.8171,"scored":false,"free":false,"goal":false},{"x":0.5447,"y":0.3333,"scored":false,"free":true,"goal":false},{"x":0.8088,"y":0.1925,"scored":false,"free":false,"goal":false},{"x":0.5999,"y":0.3636,"scored":false,"free":true,"goal":false},{"x":0.8044,"y":0.2644,"scored":true,"free":false,"goal":false},{"x":0.6039,"y":0.5596,"scored":true,"free":false,"goal":false},{"x":0.6874,"y":0.9145,"scored":true,"free":true,"goal":false},{"x":0.7945,"y":0.7057,"scored":true,"free":false,"goal":false},{"x":0.7798,"y":0.3132,"scored":true,"free":false,"goal":false},{"x":0.7181,"y":0.2993,"scored":false,"free":false,"goal":false},{"x":0.7501,"y":0.6437,"scored":true,"free":true,"goal":false},{"x":0.8965,"y":0.4383,"scored":false,"free":false,"goal":false},{"x":0.8691,"y":0.506,"scored":true,"free":true,"goal":false},{"x":0.9068,"y":0.3013,"scored":true,"free":false,"goal":false},{"x":0.7612,"y":0.2406,"scored":true,"free":false,"goal":false},{"x":0.5063,"y":0.7367,"scored":false,"free":true,"goal":false},{"x":0.6961,"y":0.4313,"scored":true,"free":true,"goal":false},{"x":0.7562,"y":0.4573,"scored":true,"free":true,"goal":false},{"x":0.9471,"y":0.309,"scored":false,"free":false,"goal":false},{"x":0.842,"y":0.7711,"scored":false,"free":false,"goal":false},{"x":0.7062,"y":0.5081,"scored":false,"free":false,"goal":false},{"x":0.694,"y":0.3871,"scored":true,"free":true,"goal":false},{"x":0.9006,"y":0.4777,"scored":true,"free":false,"goal":false},{"x":0.8783,"y":0.5346,"scored":false,"free":false,"goal":false},{"x":0.9267,"y":0.385,"scored":true,"free":false,"goal":true},{"x":0.9204,"y":0.4811,"scored":false,"free":false,"goal":false},{"x":0.8451,"y":0.5118,"scored":false,"free":false,"goal":false},{"x":0.9135,"y":0.4793,"scored":true,"free":false,"goal":false},{"x":0.6961,"y":0.6124,"scored":false,"free":false,"goal":false},{"x":0.9623,"y":0.5286,"scored":false,"free":false,"goal":false},{"x":0.8319,"y":0.2708,"scored":false,"free":false,"goal":false},{"x":0.5801,"y":0.6888,"scored":false,"free":true,"goal":false},{"x":0.7359,"y":0.3136,"scored":false,"free":false,"goal":false},{"x":0.8051,"y":0.7827,"scored":false,"free":false,"goal":false},{"x":0.6248,"y":0.6651,"scored":false,"free":true,"goal":false},{"x":0.698,"y":0.511,"scored":true,"free":false,"goal":false},{"x":0.8033,"y":0.3468,"scored":true,"free":true,"goal":false},{"x":0.6907,"y":0.7222,"scored":false,"free":false,"goal":false},{"x":0.7468,"y":0.7342,"scored":true,"free":true,"goal":false},{"x":0.7605,"y":0.2745,"scored":true,"free":true,"goal":false},{"x":0.8113,"y":0.7961,"scored":false,"free":false,"goal":false},{"x":0.7005,"y":0.4787,"scored":true,"free":true,"goal":false},{"x":0.689,"y":0.4074,"scored":false,"free":false,"goal":false},{"x":0.6835,"y":0.2981,"scored":false,"free":true,"goal":false},{"x":0.7282,"y":0.5049,"scored":false,"free":true,"goal":false},{"x":0.7694,"y":0.4633,"scored":true,"free":false,"goal":false},{"x":0.5591,"y":0.4371,"scored":false,"free":false,"goal":false},{"x":0.7851,"y":0.5132,"scored":true,"free":false,"goal":false},{"x":0.8141,"y":0.4963,"scored":true,"free":false,"goal":false},{"x":0.7428,"y":0.3524,"scored":true,"free":false,"goal":false},{"x":0.7515,"y":0.3268,"scored":false,"free":true,"goal":false},{"x":0.8012,"y":0.36,"scored":true,"free":true,"goal":false},{"x":0.747,"y":0.7031,"scored":true,"free":true,"goal":false},{"x":0.8066,"y":0.8607,"scored":true,"free":true,"goal":false},{"x":0.9133,"y":0.6639,"scored":false,"free":false,"goal":false},{"x":0.8793,"y":0.3953,"scored":false,"free":false,"goal":false},{"x":0.8122,"y":0.4678,"scored":true,"free":false,"goal":false},{"x":0.7556,"y":0.1428,"scored":false,"free":true,"goal":false},{"x":0.9164,"y":0.5334,"scored":true,"free":false,"goal":true},{"x":0.7354,"y":0.2972,"scored":true,"free":true,"goal":false},{"x":0.7865,"y":0.1543,"scored":true,"free":false,"goal":false},{"x":0.8102,"y":0.2003,"scored":true,"free":true,"goal":false},{"x":0.7524,"y":0.8475,"scored":false,"free":false,"goal":false},{"x":0.6492,"y":0.4771,"scored":false,"free":false,"goal":false}],"seasonZonesUs":[{"label":"INSIDE D","scored":49,"total":104,"pct":47,"color":"#f5c518","fromX":0.764,"toX":1.0},{"label":"D TO ARC","scored":25,"total":56,"pct":45,"color":"#f5c518","fromX":0.714,"toX":0.764},{"label":"OUTSIDE 45M","scored":30,"total":64,"pct":47,"color":"#f5c518","fromX":0.5,"toX":0.714}],"seasonZonesOpp":[{"label":"INSIDE D","scored":38,"total":80,"pct":48,"color":"#f5c518","fromX":0.764,"toX":1.0},{"label":"D TO ARC","scored":20,"total":41,"pct":49,"color":"#f5c518","fromX":0.714,"toX":0.764},{"label":"OUTSIDE 45M","scored":18,"total":58,"pct":31,"color":"#e04545","fromX":0.5,"toX":0.714}],"seasonPoUs":[{"x":0.6488,"y":0.2451,"won":false,"dist":"Mid","side":"Left"},{"x":0.5453,"y":0.1887,"won":false,"dist":"Short","side":"Left"},{"x":0.7352,"y":0.2455,"won":false,"dist":"Long","side":"Left"},{"x":0.5124,"y":0.1969,"won":false,"dist":"Short","side":"Left"},{"x":0.7622,"y":0.3187,"won":true,"dist":"Long","side":"Left"},{"x":0.5226,"y":0.2316,"won":true,"dist":"Short","side":"Left"},{"x":0.6541,"y":0.3631,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6243,"y":0.8684,"won":false,"dist":"Mid","side":"Right"},{"x":0.7186,"y":0.3456,"won":false,"dist":"Long","side":"Centre"},{"x":0.525,"y":0.1399,"won":false,"dist":"Short","side":"Left"},{"x":0.5536,"y":0.1019,"won":true,"dist":"Short","side":"Left"},{"x":0.7273,"y":0.6956,"won":true,"dist":"Long","side":"Right"},{"x":0.7405,"y":0.6722,"won":false,"dist":"Long","side":"Right"},{"x":0.5589,"y":0.7518,"won":true,"dist":"Short","side":"Right"},{"x":0.6354,"y":0.6686,"won":true,"dist":"Mid","side":"Right"},{"x":0.5179,"y":0.7727,"won":false,"dist":"Short","side":"Right"},{"x":0.5242,"y":0.1924,"won":false,"dist":"Short","side":"Left"},{"x":0.6533,"y":0.8005,"won":false,"dist":"Mid","side":"Right"},{"x":0.8011,"y":0.5118,"won":true,"dist":"Long","side":"Centre"},{"x":0.5926,"y":0.4891,"won":false,"dist":"Short","side":"Centre"},{"x":0.5171,"y":0.8043,"won":true,"dist":"Short","side":"Right"},{"x":0.5188,"y":0.3853,"won":true,"dist":"Short","side":"Centre"},{"x":0.6375,"y":0.3349,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5542,"y":0.6358,"won":true,"dist":"Short","side":"Centre"},{"x":0.6399,"y":0.3326,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5531,"y":0.8072,"won":false,"dist":"Short","side":"Right"},{"x":0.8371,"y":0.8124,"won":false,"dist":"Long","side":"Right"},{"x":0.5257,"y":0.5676,"won":true,"dist":"Short","side":"Centre"},{"x":0.7837,"y":0.3419,"won":true,"dist":"Long","side":"Centre"},{"x":0.6087,"y":0.224,"won":true,"dist":"Mid","side":"Left"},{"x":0.5532,"y":0.5629,"won":true,"dist":"Short","side":"Centre"},{"x":0.521,"y":0.7475,"won":false,"dist":"Short","side":"Right"},{"x":0.779,"y":0.7046,"won":true,"dist":"Long","side":"Right"},{"x":0.5235,"y":0.8068,"won":false,"dist":"Short","side":"Right"},{"x":0.5773,"y":0.6606,"won":true,"dist":"Short","side":"Right"},{"x":0.641,"y":0.2571,"won":true,"dist":"Mid","side":"Left"},{"x":0.7728,"y":0.2256,"won":true,"dist":"Long","side":"Left"},{"x":0.6975,"y":0.7138,"won":false,"dist":"Mid","side":"Right"},{"x":0.6003,"y":0.3395,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5778,"y":0.5215,"won":false,"dist":"Short","side":"Centre"},{"x":0.5283,"y":0.1781,"won":true,"dist":"Short","side":"Left"},{"x":0.5143,"y":0.3235,"won":false,"dist":"Short","side":"Left"},{"x":0.7572,"y":0.9682,"won":false,"dist":"Long","side":"Right"},{"x":0.5071,"y":0.8452,"won":true,"dist":"Short","side":"Right"},{"x":0.8312,"y":0.7869,"won":true,"dist":"Long","side":"Right"},{"x":0.5238,"y":0.3218,"won":false,"dist":"Short","side":"Left"},{"x":0.7385,"y":0.7157,"won":true,"dist":"Long","side":"Right"},{"x":0.6199,"y":0.9666,"won":true,"dist":"Mid","side":"Right"},{"x":0.7409,"y":0.8799,"won":true,"dist":"Long","side":"Right"},{"x":0.5116,"y":0.5074,"won":true,"dist":"Short","side":"Centre"},{"x":0.5632,"y":0.338,"won":true,"dist":"Short","side":"Centre"},{"x":0.5505,"y":0.185,"won":true,"dist":"Short","side":"Left"},{"x":0.5273,"y":0.5692,"won":false,"dist":"Short","side":"Centre"},{"x":0.5207,"y":0.5251,"won":true,"dist":"Short","side":"Centre"},{"x":0.5544,"y":0.6767,"won":false,"dist":"Short","side":"Right"},{"x":0.5789,"y":0.3965,"won":true,"dist":"Short","side":"Centre"},{"x":0.5603,"y":0.6484,"won":false,"dist":"Short","side":"Centre"},{"x":0.7563,"y":0.2205,"won":true,"dist":"Long","side":"Left"},{"x":0.5795,"y":0.347,"won":true,"dist":"Short","side":"Centre"},{"x":0.6012,"y":0.1334,"won":false,"dist":"Mid","side":"Left"},{"x":0.7796,"y":0.2561,"won":true,"dist":"Long","side":"Left"},{"x":0.5644,"y":0.5569,"won":true,"dist":"Short","side":"Centre"},{"x":0.8164,"y":0.8755,"won":false,"dist":"Long","side":"Right"},{"x":0.5051,"y":0.4415,"won":true,"dist":"Short","side":"Centre"},{"x":0.8272,"y":0.8433,"won":true,"dist":"Long","side":"Right"},{"x":0.5046,"y":0.707,"won":false,"dist":"Short","side":"Right"},{"x":0.6151,"y":0.5927,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5235,"y":0.4643,"won":false,"dist":"Short","side":"Centre"},{"x":0.525,"y":0.7934,"won":true,"dist":"Short","side":"Right"},{"x":0.6511,"y":0.7942,"won":true,"dist":"Mid","side":"Right"},{"x":0.5204,"y":0.5856,"won":false,"dist":"Short","side":"Centre"},{"x":0.5341,"y":0.6449,"won":false,"dist":"Short","side":"Centre"},{"x":0.5411,"y":0.3421,"won":false,"dist":"Short","side":"Centre"},{"x":0.6086,"y":0.1934,"won":true,"dist":"Mid","side":"Left"},{"x":0.5833,"y":0.2896,"won":true,"dist":"Short","side":"Left"},{"x":0.5231,"y":0.7615,"won":true,"dist":"Short","side":"Right"},{"x":0.646,"y":0.5025,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5045,"y":0.816,"won":false,"dist":"Short","side":"Right"},{"x":0.5348,"y":0.209,"won":false,"dist":"Short","side":"Left"},{"x":0.5303,"y":0.3437,"won":false,"dist":"Short","side":"Centre"},{"x":0.6101,"y":0.1912,"won":false,"dist":"Mid","side":"Left"},{"x":0.6551,"y":0.0873,"won":false,"dist":"Mid","side":"Left"},{"x":0.59,"y":0.7435,"won":false,"dist":"Short","side":"Right"},{"x":0.5143,"y":0.454,"won":true,"dist":"Short","side":"Centre"},{"x":0.5378,"y":0.3846,"won":true,"dist":"Short","side":"Centre"},{"x":0.5581,"y":0.295,"won":false,"dist":"Short","side":"Left"},{"x":0.5348,"y":0.2783,"won":false,"dist":"Short","side":"Left"},{"x":0.5248,"y":0.3668,"won":false,"dist":"Short","side":"Centre"},{"x":0.5382,"y":0.1057,"won":false,"dist":"Short","side":"Left"},{"x":0.539,"y":0.1783,"won":false,"dist":"Short","side":"Left"},{"x":0.5407,"y":0.2742,"won":true,"dist":"Short","side":"Left"},{"x":0.5367,"y":0.6091,"won":false,"dist":"Short","side":"Centre"},{"x":0.578,"y":0.7779,"won":false,"dist":"Short","side":"Right"},{"x":0.5278,"y":0.4408,"won":true,"dist":"Short","side":"Centre"},{"x":0.514,"y":0.3265,"won":true,"dist":"Short","side":"Left"},{"x":0.649,"y":0.7851,"won":true,"dist":"Mid","side":"Right"},{"x":0.7282,"y":0.7932,"won":true,"dist":"Long","side":"Right"},{"x":0.5116,"y":0.2821,"won":false,"dist":"Short","side":"Left"},{"x":0.5778,"y":0.7964,"won":false,"dist":"Short","side":"Right"},{"x":0.607,"y":0.5536,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5818,"y":0.6967,"won":false,"dist":"Short","side":"Right"},{"x":0.5237,"y":0.5904,"won":false,"dist":"Short","side":"Centre"},{"x":0.5985,"y":0.6284,"won":true,"dist":"Short","side":"Centre"},{"x":0.501,"y":0.3444,"won":false,"dist":"Short","side":"Centre"},{"x":0.6458,"y":0.4668,"won":false,"dist":"Mid","side":"Centre"},{"x":0.8676,"y":0.3849,"won":true,"dist":"Long","side":"Centre"},{"x":0.524,"y":0.2064,"won":false,"dist":"Short","side":"Left"},{"x":0.5323,"y":0.7152,"won":true,"dist":"Short","side":"Right"},{"x":0.5276,"y":0.6746,"won":true,"dist":"Short","side":"Right"},{"x":0.505,"y":0.2234,"won":false,"dist":"Short","side":"Left"},{"x":0.696,"y":0.7411,"won":false,"dist":"Mid","side":"Right"},{"x":0.5391,"y":0.7605,"won":false,"dist":"Short","side":"Right"},{"x":0.5139,"y":0.2622,"won":true,"dist":"Short","side":"Left"},{"x":0.5001,"y":0.8631,"won":false,"dist":"Short","side":"Right"},{"x":0.6035,"y":0.3031,"won":false,"dist":"Mid","side":"Left"},{"x":0.5613,"y":0.1631,"won":false,"dist":"Short","side":"Left"},{"x":0.5845,"y":0.4178,"won":false,"dist":"Short","side":"Centre"},{"x":0.5061,"y":0.7915,"won":true,"dist":"Short","side":"Right"},{"x":0.5718,"y":0.7235,"won":false,"dist":"Short","side":"Right"},{"x":0.542,"y":0.1555,"won":true,"dist":"Short","side":"Left"},{"x":0.554,"y":0.2539,"won":true,"dist":"Short","side":"Left"},{"x":0.5045,"y":0.5177,"won":true,"dist":"Short","side":"Centre"},{"x":0.5702,"y":0.5179,"won":false,"dist":"Short","side":"Centre"},{"x":0.7303,"y":0.2784,"won":true,"dist":"Long","side":"Left"},{"x":0.5997,"y":0.3765,"won":true,"dist":"Short","side":"Centre"},{"x":0.5043,"y":0.6462,"won":false,"dist":"Short","side":"Centre"},{"x":0.8805,"y":0.2031,"won":true,"dist":"Long","side":"Left"},{"x":0.5153,"y":0.4953,"won":false,"dist":"Short","side":"Centre"},{"x":0.6704,"y":0.3623,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5053,"y":0.291,"won":false,"dist":"Short","side":"Left"},{"x":0.7544,"y":0.4953,"won":true,"dist":"Long","side":"Centre"}],"seasonPoOpp":[{"x":0.6163,"y":0.7049,"won":false,"dist":"Mid","side":"Right"},{"x":0.6584,"y":0.4506,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6686,"y":0.3787,"won":true,"dist":"Mid","side":"Centre"},{"x":0.543,"y":0.8369,"won":false,"dist":"Short","side":"Right"},{"x":0.8114,"y":0.5047,"won":true,"dist":"Long","side":"Centre"},{"x":0.5716,"y":0.7449,"won":false,"dist":"Short","side":"Right"},{"x":0.5664,"y":0.7651,"won":false,"dist":"Short","side":"Right"},{"x":0.8294,"y":0.5167,"won":true,"dist":"Long","side":"Centre"},{"x":0.6086,"y":0.8019,"won":false,"dist":"Mid","side":"Right"},{"x":0.6123,"y":0.0995,"won":true,"dist":"Mid","side":"Left"},{"x":0.6858,"y":0.3468,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5223,"y":0.1304,"won":false,"dist":"Short","side":"Left"},{"x":0.6161,"y":0.1328,"won":true,"dist":"Mid","side":"Left"},{"x":0.624,"y":0.3896,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5014,"y":0.2504,"won":false,"dist":"Short","side":"Left"},{"x":0.5391,"y":0.1743,"won":true,"dist":"Short","side":"Left"},{"x":0.7183,"y":0.8377,"won":true,"dist":"Long","side":"Right"},{"x":0.8443,"y":0.8092,"won":true,"dist":"Long","side":"Right"},{"x":0.7303,"y":0.2126,"won":true,"dist":"Long","side":"Left"},{"x":0.719,"y":0.2791,"won":true,"dist":"Long","side":"Left"},{"x":0.7073,"y":0.8317,"won":false,"dist":"Long","side":"Right"},{"x":0.7565,"y":0.2375,"won":true,"dist":"Long","side":"Left"},{"x":0.5015,"y":0.1431,"won":true,"dist":"Short","side":"Left"},{"x":0.5673,"y":0.2468,"won":false,"dist":"Short","side":"Left"},{"x":0.8755,"y":0.8896,"won":true,"dist":"Long","side":"Right"},{"x":0.5144,"y":0.368,"won":false,"dist":"Short","side":"Centre"},{"x":0.5349,"y":0.071,"won":false,"dist":"Short","side":"Left"},{"x":0.635,"y":0.0829,"won":true,"dist":"Mid","side":"Left"},{"x":0.6156,"y":0.7209,"won":true,"dist":"Mid","side":"Right"},{"x":0.5546,"y":0.0829,"won":true,"dist":"Short","side":"Left"},{"x":0.5509,"y":0.5725,"won":false,"dist":"Short","side":"Centre"},{"x":0.5911,"y":0.2705,"won":false,"dist":"Short","side":"Left"},{"x":0.5407,"y":0.1492,"won":false,"dist":"Short","side":"Left"},{"x":0.6096,"y":0.1556,"won":false,"dist":"Mid","side":"Left"},{"x":0.6107,"y":0.3169,"won":false,"dist":"Mid","side":"Left"},{"x":0.7304,"y":0.2478,"won":true,"dist":"Long","side":"Left"},{"x":0.6132,"y":0.6318,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5214,"y":0.1173,"won":true,"dist":"Short","side":"Left"},{"x":0.7355,"y":0.0618,"won":true,"dist":"Long","side":"Left"},{"x":0.6099,"y":0.7291,"won":false,"dist":"Mid","side":"Right"},{"x":0.6226,"y":0.3753,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5376,"y":0.1992,"won":true,"dist":"Short","side":"Left"},{"x":0.5257,"y":0.7253,"won":true,"dist":"Short","side":"Right"},{"x":0.5148,"y":0.3692,"won":true,"dist":"Short","side":"Centre"},{"x":0.5723,"y":0.3578,"won":false,"dist":"Short","side":"Centre"},{"x":0.675,"y":0.6948,"won":false,"dist":"Mid","side":"Right"},{"x":0.725,"y":0.7912,"won":true,"dist":"Long","side":"Right"},{"x":0.5161,"y":0.2573,"won":true,"dist":"Short","side":"Left"},{"x":0.5286,"y":0.2226,"won":false,"dist":"Short","side":"Left"},{"x":0.535,"y":0.2349,"won":true,"dist":"Short","side":"Left"},{"x":0.5163,"y":0.6788,"won":true,"dist":"Short","side":"Right"},{"x":0.5812,"y":0.2789,"won":false,"dist":"Short","side":"Left"},{"x":0.6293,"y":0.6741,"won":false,"dist":"Mid","side":"Right"},{"x":0.5299,"y":0.2983,"won":false,"dist":"Short","side":"Left"},{"x":0.6692,"y":0.3229,"won":true,"dist":"Mid","side":"Left"},{"x":0.655,"y":0.7007,"won":true,"dist":"Mid","side":"Right"},{"x":0.5955,"y":0.5427,"won":false,"dist":"Short","side":"Centre"},{"x":0.6182,"y":0.2266,"won":false,"dist":"Mid","side":"Left"},{"x":0.7586,"y":0.5094,"won":true,"dist":"Long","side":"Centre"},{"x":0.5164,"y":0.7686,"won":false,"dist":"Short","side":"Right"},{"x":0.8313,"y":0.9067,"won":true,"dist":"Long","side":"Right"},{"x":0.7631,"y":0.4536,"won":true,"dist":"Long","side":"Centre"},{"x":0.5046,"y":0.7479,"won":true,"dist":"Short","side":"Right"},{"x":0.7432,"y":0.5981,"won":true,"dist":"Long","side":"Centre"},{"x":0.5093,"y":0.6995,"won":false,"dist":"Short","side":"Right"},{"x":0.5632,"y":0.3574,"won":true,"dist":"Short","side":"Centre"},{"x":0.5085,"y":0.2825,"won":false,"dist":"Short","side":"Left"},{"x":0.6642,"y":0.7309,"won":false,"dist":"Mid","side":"Right"},{"x":0.5786,"y":0.1674,"won":true,"dist":"Short","side":"Left"},{"x":0.5958,"y":0.8718,"won":false,"dist":"Short","side":"Right"},{"x":0.5287,"y":0.7266,"won":false,"dist":"Short","side":"Right"},{"x":0.5763,"y":0.2839,"won":true,"dist":"Short","side":"Left"},{"x":0.5078,"y":0.1843,"won":false,"dist":"Short","side":"Left"},{"x":0.6276,"y":0.65,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6934,"y":0.7911,"won":true,"dist":"Mid","side":"Right"},{"x":0.5886,"y":0.3109,"won":true,"dist":"Short","side":"Left"},{"x":0.5845,"y":0.3891,"won":false,"dist":"Short","side":"Centre"},{"x":0.5004,"y":0.8915,"won":true,"dist":"Short","side":"Right"},{"x":0.6259,"y":0.7328,"won":true,"dist":"Mid","side":"Right"},{"x":0.5894,"y":0.0447,"won":false,"dist":"Short","side":"Left"},{"x":0.7286,"y":0.8371,"won":true,"dist":"Long","side":"Right"},{"x":0.5936,"y":0.9529,"won":true,"dist":"Short","side":"Right"},{"x":0.5457,"y":0.7771,"won":false,"dist":"Short","side":"Right"},{"x":0.5361,"y":0.6104,"won":true,"dist":"Short","side":"Centre"},{"x":0.6181,"y":0.8173,"won":true,"dist":"Mid","side":"Right"},{"x":0.533,"y":0.0165,"won":false,"dist":"Short","side":"Left"},{"x":0.5655,"y":0.8701,"won":true,"dist":"Short","side":"Right"},{"x":0.5193,"y":0.5175,"won":false,"dist":"Short","side":"Centre"},{"x":0.5281,"y":0.2251,"won":false,"dist":"Short","side":"Left"},{"x":0.6174,"y":0.2639,"won":true,"dist":"Mid","side":"Left"},{"x":0.6233,"y":0.0291,"won":false,"dist":"Mid","side":"Left"},{"x":0.5996,"y":0.7995,"won":false,"dist":"Short","side":"Right"},{"x":0.5561,"y":0.8756,"won":false,"dist":"Short","side":"Right"},{"x":0.5524,"y":0.7095,"won":true,"dist":"Short","side":"Right"},{"x":0.6217,"y":0.1423,"won":false,"dist":"Mid","side":"Left"},{"x":0.5843,"y":0.7457,"won":true,"dist":"Short","side":"Right"},{"x":0.6186,"y":0.3775,"won":false,"dist":"Mid","side":"Centre"},{"x":0.7865,"y":0.7742,"won":true,"dist":"Long","side":"Right"},{"x":0.5386,"y":0.2062,"won":true,"dist":"Short","side":"Left"},{"x":0.6825,"y":0.285,"won":true,"dist":"Mid","side":"Left"},{"x":0.8093,"y":0.4763,"won":true,"dist":"Long","side":"Centre"},{"x":0.5271,"y":0.7637,"won":true,"dist":"Short","side":"Right"},{"x":0.5492,"y":0.7125,"won":true,"dist":"Short","side":"Right"},{"x":0.5735,"y":0.8128,"won":true,"dist":"Short","side":"Right"},{"x":0.512,"y":0.6771,"won":false,"dist":"Short","side":"Right"},{"x":0.5439,"y":0.9479,"won":true,"dist":"Short","side":"Right"},{"x":0.7004,"y":0.6318,"won":true,"dist":"Long","side":"Centre"},{"x":0.7008,"y":0.2203,"won":true,"dist":"Long","side":"Left"},{"x":0.552,"y":0.837,"won":false,"dist":"Short","side":"Right"},{"x":0.5598,"y":0.9208,"won":true,"dist":"Short","side":"Right"},{"x":0.5063,"y":0.9336,"won":false,"dist":"Short","side":"Right"},{"x":0.646,"y":0.7983,"won":true,"dist":"Mid","side":"Right"},{"x":0.6807,"y":0.5726,"won":true,"dist":"Mid","side":"Centre"},{"x":0.6702,"y":0.2877,"won":true,"dist":"Mid","side":"Left"},{"x":0.6059,"y":0.7996,"won":false,"dist":"Mid","side":"Right"},{"x":0.5442,"y":0.7957,"won":false,"dist":"Short","side":"Right"},{"x":0.5231,"y":0.7003,"won":false,"dist":"Short","side":"Right"},{"x":0.674,"y":0.8613,"won":false,"dist":"Mid","side":"Right"},{"x":0.5377,"y":0.5215,"won":false,"dist":"Short","side":"Centre"},{"x":0.6683,"y":0.5643,"won":false,"dist":"Mid","side":"Centre"},{"x":0.6919,"y":0.2518,"won":false,"dist":"Mid","side":"Left"},{"x":0.6672,"y":0.6855,"won":false,"dist":"Mid","side":"Right"},{"x":0.6278,"y":0.4169,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5756,"y":0.5916,"won":false,"dist":"Short","side":"Centre"},{"x":0.5098,"y":0.2195,"won":false,"dist":"Short","side":"Left"},{"x":0.5279,"y":0.5047,"won":false,"dist":"Short","side":"Centre"},{"x":0.6294,"y":0.6437,"won":false,"dist":"Mid","side":"Centre"},{"x":0.591,"y":0.6583,"won":false,"dist":"Short","side":"Centre"},{"x":0.5422,"y":0.8463,"won":false,"dist":"Short","side":"Right"},{"x":0.511,"y":0.2996,"won":false,"dist":"Short","side":"Left"},{"x":0.53,"y":0.3625,"won":false,"dist":"Short","side":"Centre"},{"x":0.5908,"y":0.8026,"won":false,"dist":"Short","side":"Right"},{"x":0.5024,"y":0.543,"won":true,"dist":"Short","side":"Centre"},{"x":0.6066,"y":0.5408,"won":false,"dist":"Mid","side":"Centre"},{"x":0.5979,"y":0.8066,"won":false,"dist":"Short","side":"Right"},{"x":0.5552,"y":0.305,"won":false,"dist":"Short","side":"Left"},{"x":0.5397,"y":0.4781,"won":false,"dist":"Short","side":"Centre"},{"x":0.5291,"y":0.1534,"won":false,"dist":"Short","side":"Left"},{"x":0.7141,"y":0.5748,"won":true,"dist":"Long","side":"Centre"},{"x":0.6456,"y":0.1825,"won":false,"dist":"Mid","side":"Left"},{"x":0.5796,"y":0.3456,"won":true,"dist":"Short","side":"Centre"},{"x":0.5211,"y":0.7696,"won":true,"dist":"Short","side":"Right"},{"x":0.548,"y":0.8361,"won":false,"dist":"Short","side":"Right"},{"x":0.5065,"y":0.21,"won":true,"dist":"Short","side":"Left"},{"x":0.5264,"y":0.1553,"won":true,"dist":"Short","side":"Left"},{"x":0.5211,"y":0.8352,"won":true,"dist":"Short","side":"Right"},{"x":0.508,"y":0.6805,"won":false,"dist":"Short","side":"Right"},{"x":0.7844,"y":0.8243,"won":true,"dist":"Long","side":"Right"},{"x":0.5165,"y":0.1851,"won":true,"dist":"Short","side":"Left"},{"x":0.5351,"y":0.8304,"won":false,"dist":"Short","side":"Right"},{"x":0.5312,"y":0.5094,"won":false,"dist":"Short","side":"Centre"},{"x":0.5644,"y":0.2682,"won":false,"dist":"Short","side":"Left"},{"x":0.5897,"y":0.9896,"won":false,"dist":"Short","side":"Right"},{"x":0.7138,"y":0.6619,"won":false,"dist":"Long","side":"Right"},{"x":0.5692,"y":0.8392,"won":true,"dist":"Short","side":"Right"},{"x":0.666,"y":0.5819,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5604,"y":0.5642,"won":true,"dist":"Short","side":"Centre"},{"x":0.628,"y":0.1549,"won":true,"dist":"Mid","side":"Left"},{"x":0.5496,"y":0.6284,"won":true,"dist":"Short","side":"Centre"},{"x":0.6549,"y":0.5174,"won":false,"dist":"Mid","side":"Centre"},{"x":0.8403,"y":0.4991,"won":true,"dist":"Long","side":"Centre"},{"x":0.8079,"y":0.1684,"won":true,"dist":"Long","side":"Left"},{"x":0.6008,"y":0.4191,"won":true,"dist":"Mid","side":"Centre"}],"seasonPoGridUs":{"Short_Left":{"won":10,"total":26,"pct":38,"color":"#e04545"},"Short_Centre":{"won":17,"total":34,"pct":50,"color":"#f5c518"},"Short_Right":{"won":9,"total":23,"pct":39,"color":"#e04545"},"Mid_Left":{"won":3,"total":8,"pct":38,"color":"#e04545"},"Mid_Centre":{"won":6,"total":9,"pct":67,"color":"#34c967"},"Mid_Right":{"won":4,"total":8,"pct":50,"color":"#f5c518"},"Long_Left":{"won":6,"total":7,"pct":86,"color":"#34c967"},"Long_Centre":{"won":4,"total":5,"pct":80,"color":"#34c967"},"Long_Right":{"won":7,"total":11,"pct":64,"color":"#34c967"}},"seasonPoGridOpp":{"Short_Left":{"won":14,"total":33,"pct":42,"color":"#e04545"},"Short_Centre":{"won":7,"total":20,"pct":35,"color":"#e04545"},"Short_Right":{"won":16,"total":38,"pct":42,"color":"#e04545"},"Mid_Left":{"won":8,"total":15,"pct":53,"color":"#f5c518"},"Mid_Centre":{"won":7,"total":16,"pct":44,"color":"#e04545"},"Mid_Right":{"won":6,"total":15,"pct":40,"color":"#e04545"},"Long_Left":{"won":7,"total":7,"pct":100,"color":"#34c967"},"Long_Centre":{"won":9,"total":9,"pct":100,"color":"#34c967"},"Long_Right":{"won":8,"total":10,"pct":80,"color":"#34c967"}},"seasonPoWonUs":{"w":66,"t":131},"seasonPoWonOpp":{"w":82,"t":163},"poSpeed":{"us_score":{"avg":63.0,"p10":56,"p90":73,"n":13},"us_wide":{"avg":65.1,"p10":39,"p90":84,"n":15},"opp_score":{"avg":65.5,"p10":46,"p90":81,"n":20},"opp_wide":{"avg":67.2,"p10":47,"p90":85,"n":15}},"koMatrix":{"matrix":{"Short_Fast":{"won":4,"total":5,"pct":80,"color":"#34c967"},"Short_Med":{"won":2,"total":6,"pct":33,"color":"#e04545"},"Short_Slow":{"won":3,"total":7,"pct":43,"color":"#e04545"},"Mid_Fast":{"won":2,"total":2,"pct":100,"color":"#34c967"},"Mid_Med":{"won":0,"total":1,"pct":0,"color":"#e04545"},"Mid_Slow":{"won":0,"total":1,"pct":0,"color":"#e04545"},"Long_Fast":{"won":3,"total":3,"pct":100,"color":"#34c967"},"Long_Med":{"won":2,"total":2,"pct":100,"color":"#34c967"},"Long_Slow":{"won":0,"total":1,"pct":0,"color":"#e04545"}},"thresholds":{"fast":56,"slow":71},"total":28},"periodScoring":{"labels":["0-10","10-20","20-30","30-40","40-50","50-60"],"seasonUs":[14,16,13,23,32,30],"seasonOpp":[13,9,10,25,10,17]},"seasonCommentary":["St Judes have posted a 5W 1D 2L record across 8 matches, scoring 128 pts and conceding 84 \u2014 a points difference of +44.","From-play scoring is Judes' primary weapon: 66 scores from play vs 41 for opposition across the season \u2014 a 1.6x advantage.","Shot conversion stands at 46% for Judes vs 42% for opposition. 224 total shots taken demonstrates high attacking volume.","Own puck-out retention at 50% (66/131). Opposition retain 50% of their own restarts. Long puck-outs contested in the opposition half win at 74%+ \u2014 a key tactical opportunity.","Free dependency: Judes 37% vs opposition 46%. Judes are creating significantly more from open play \u2014 a key strength.","Ellie Young leads all scoring with 6-35 (53 pts across 8 matches). Spreading the scoring load remains the key squad development target.","The 40-50-minute window is Judes' strongest scoring phase. The 20-30-minute period is the vulnerability to address \u2014 opposition tend to level or lead during this window."],"latestCommentary":["St Judes won vs Na Fianna 0-13 to 1-09 \u2014 a solid performance.","Shot volume: Judes 34 vs Na Fianna 16. Conversion: 38% vs 62% \u2014 opposition edged the conversion battle.","Own puck-out retention: 8/13 (62%) vs opposition 15/23 (65%). A tight battle at the puck-out.","Possession: Judes conceded 25 turnovers. Ball security under pressure and reducing possession loss in the middle third are ongoing focus areas.","Productivity: 8.9 shots per 10 possessions for Judes vs 4.3 for Na Fianna. Judes converting possession to scoring chances more efficiently.","Ellie Young top scored with 0-07 (0g 6f).","Period analysis: strongest 40-50 window (5 pts scored). The 10-20 period was the quietest scoring phase \u2014 pressing higher in this window could open up more scoring opportunities."],"latestMatch":{"opp":"Na Fianna","date":"11 Jun 2026","comp":"SFL","result":"W","rd":8,"jg":0,"jp":13,"jfg":0,"jfp":6,"og":1,"op":9,"jshots":34,"oshots":16,"jscored":13,"oscored":10,"jconv":38,"oconv":62,"jpl":25,"opl":0,"jpo_won":8,"jpo_total":13,"opo_won":15,"opo_total":23,"prod_us":8.9,"prod_opp":4.3,"scorers":[{"name":"Ellie Young","score":"0-07","frees":"(0g 6f)","tot":7},{"name":"Joye Atkinson","score":"0-02","frees":"","tot":2},{"name":"Caoimhe French","score":"0-02","frees":"","tot":2},{"name":"Sin\u00e9ad Nolan","score":"0-01","frees":"","tot":1},{"name":"Lauren Kearney","score":"0-01","frees":"","tot":1}],"periods_us":[2,0,0,3,5,3],"periods_opp":[3,1,2,5,0,1],"shots_us":[{"x":0.8439,"y":0.9577,"scored":false,"free":true,"goal":false},{"x":0.722,"y":0.8125,"scored":false,"free":false,"goal":false},{"x":0.7317,"y":0.835,"scored":true,"free":false,"goal":false},{"x":0.7805,"y":0.1603,"scored":true,"free":false,"goal":false},{"x":0.6918,"y":0.4799,"scored":false,"free":false,"goal":false},{"x":0.7943,"y":0.8744,"scored":false,"free":false,"goal":false},{"x":0.77,"y":0.6914,"scored":false,"free":false,"goal":false},{"x":0.716,"y":0.9492,"scored":false,"free":false,"goal":false},{"x":0.9327,"y":0.2328,"scored":false,"free":false,"goal":false},{"x":0.6788,"y":0.5251,"scored":false,"free":false,"goal":false},{"x":0.7028,"y":0.6605,"scored":false,"free":false,"goal":false},{"x":0.5417,"y":0.7323,"scored":false,"free":true,"goal":false},{"x":0.6449,"y":0.6165,"scored":true,"free":false,"goal":false},{"x":0.6481,"y":0.6912,"scored":false,"free":false,"goal":false},{"x":0.7493,"y":0.2255,"scored":false,"free":false,"goal":false},{"x":0.8796,"y":0.4868,"scored":false,"free":false,"goal":false},{"x":0.6628,"y":0.5089,"scored":true,"free":true,"goal":false},{"x":0.7716,"y":0.8302,"scored":false,"free":false,"goal":false},{"x":0.8311,"y":0.4452,"scored":true,"free":false,"goal":false},{"x":0.7621,"y":0.469,"scored":true,"free":false,"goal":false},{"x":0.834,"y":0.5759,"scored":true,"free":true,"goal":false},{"x":0.7305,"y":0.4987,"scored":false,"free":false,"goal":false},{"x":0.7577,"y":0.5106,"scored":true,"free":true,"goal":false},{"x":0.8508,"y":0.147,"scored":true,"free":true,"goal":false},{"x":0.8082,"y":0.6711,"scored":true,"free":true,"goal":false},{"x":0.7519,"y":0.7406,"scored":false,"free":true,"goal":false},{"x":0.7344,"y":0.6306,"scored":true,"free":false,"goal":false},{"x":0.7471,"y":0.1185,"scored":false,"free":true,"goal":false},{"x":0.9066,"y":0.7993,"scored":false,"free":false,"goal":false},{"x":0.7269,"y":0.5106,"scored":false,"free":false,"goal":false},{"x":0.5766,"y":0.5712,"scored":false,"free":false,"goal":false},{"x":0.693,"y":0.4357,"scored":false,"free":false,"goal":false},{"x":0.7426,"y":0.2694,"scored":true,"free":false,"goal":false},{"x":0.5154,"y":0.4512,"scored":true,"free":true,"goal":false}],"shots_opp":[{"x":0.8141,"y":0.4963,"scored":true,"free":false,"goal":false},{"x":0.7428,"y":0.3524,"scored":true,"free":false,"goal":false},{"x":0.7515,"y":0.3268,"scored":false,"free":true,"goal":false},{"x":0.8012,"y":0.36,"scored":true,"free":true,"goal":false},{"x":0.747,"y":0.7031,"scored":true,"free":true,"goal":false},{"x":0.8066,"y":0.8607,"scored":true,"free":true,"goal":false},{"x":0.9133,"y":0.6639,"scored":false,"free":false,"goal":false},{"x":0.8793,"y":0.3953,"scored":false,"free":false,"goal":false},{"x":0.8122,"y":0.4678,"scored":true,"free":false,"goal":false},{"x":0.7556,"y":0.1428,"scored":false,"free":true,"goal":false},{"x":0.9164,"y":0.5334,"scored":true,"free":false,"goal":true},{"x":0.7354,"y":0.2972,"scored":true,"free":true,"goal":false},{"x":0.7865,"y":0.1543,"scored":true,"free":false,"goal":false},{"x":0.8102,"y":0.2003,"scored":true,"free":true,"goal":false},{"x":0.7524,"y":0.8475,"scored":false,"free":false,"goal":false},{"x":0.6492,"y":0.4771,"scored":false,"free":false,"goal":false}],"po_us":[{"x":0.5718,"y":0.7235,"won":false,"dist":"Short","side":"Right"},{"x":0.542,"y":0.1555,"won":true,"dist":"Short","side":"Left"},{"x":0.554,"y":0.2539,"won":true,"dist":"Short","side":"Left"},{"x":0.5045,"y":0.5177,"won":true,"dist":"Short","side":"Centre"},{"x":0.5702,"y":0.5179,"won":false,"dist":"Short","side":"Centre"},{"x":0.7303,"y":0.2784,"won":true,"dist":"Long","side":"Left"},{"x":0.5997,"y":0.3765,"won":true,"dist":"Short","side":"Centre"},{"x":0.5043,"y":0.6462,"won":false,"dist":"Short","side":"Centre"},{"x":0.8805,"y":0.2031,"won":true,"dist":"Long","side":"Left"},{"x":0.5153,"y":0.4953,"won":false,"dist":"Short","side":"Centre"},{"x":0.6704,"y":0.3623,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5053,"y":0.291,"won":false,"dist":"Short","side":"Left"},{"x":0.7544,"y":0.4953,"won":true,"dist":"Long","side":"Centre"}],"po_opp":[{"x":0.5796,"y":0.3456,"won":true,"dist":"Short","side":"Centre"},{"x":0.5211,"y":0.7696,"won":true,"dist":"Short","side":"Right"},{"x":0.548,"y":0.8361,"won":false,"dist":"Short","side":"Right"},{"x":0.5065,"y":0.21,"won":true,"dist":"Short","side":"Left"},{"x":0.5264,"y":0.1553,"won":true,"dist":"Short","side":"Left"},{"x":0.5211,"y":0.8352,"won":true,"dist":"Short","side":"Right"},{"x":0.508,"y":0.6805,"won":false,"dist":"Short","side":"Right"},{"x":0.7844,"y":0.8243,"won":true,"dist":"Long","side":"Right"},{"x":0.5165,"y":0.1851,"won":true,"dist":"Short","side":"Left"},{"x":0.5351,"y":0.8304,"won":false,"dist":"Short","side":"Right"},{"x":0.5312,"y":0.5094,"won":false,"dist":"Short","side":"Centre"},{"x":0.5644,"y":0.2682,"won":false,"dist":"Short","side":"Left"},{"x":0.5897,"y":0.9896,"won":false,"dist":"Short","side":"Right"},{"x":0.7138,"y":0.6619,"won":false,"dist":"Long","side":"Right"},{"x":0.5692,"y":0.8392,"won":true,"dist":"Short","side":"Right"},{"x":0.666,"y":0.5819,"won":true,"dist":"Mid","side":"Centre"},{"x":0.5604,"y":0.5642,"won":true,"dist":"Short","side":"Centre"},{"x":0.628,"y":0.1549,"won":true,"dist":"Mid","side":"Left"},{"x":0.5496,"y":0.6284,"won":true,"dist":"Short","side":"Centre"},{"x":0.6549,"y":0.5174,"won":false,"dist":"Mid","side":"Centre"},{"x":0.8403,"y":0.4991,"won":true,"dist":"Long","side":"Centre"},{"x":0.8079,"y":0.1684,"won":true,"dist":"Long","side":"Left"},{"x":0.6008,"y":0.4191,"won":true,"dist":"Mid","side":"Centre"}]},"playScoreUs":66,"freeScoreUs":38,"playScoreOpp":41,"freeScoreOpp":35,"freeDependUs":37,"freeDependOpp":46};
+</script>
+<script>
+const isSc=(s)=>s.scored;
+const DC={W:'var(--green)',L:'var(--red)',D:'var(--amber)'};
+const NEON='var(--gold)';
+const C_bg='#06080f';
+const LN='var(--green)';
+const LN2='var(--red)';
+const D=window.__RSA__;
+const PL=['0-10','10-20','20-30','30-40','40-50','50-60'];
+
+// ── HELPERS ──────────────────────────────────────────────
+function sc_str(g,p){return g+'-'+String(p).padStart(2,'0')}
+function zc(pct){if(pct==null)return'#1e2240';if(pct>=60)return'#34c967';if(pct>=45)return'#f5c518';return'#e04545'}
+
+function buildPeriodChart(elId,us,opp){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  const maxV=Math.max(...us,...opp,1);
+  let h='';
+  for(let i=0;i<6;i++){
+    const hj=Math.round((us[i]/maxV)*82);
+    const ho=Math.round((opp[i]/maxV)*82);
+    h+=`<div class="per-grp"><div class="per-bars">
+      <div class="per-bar j" style="height:${hj}px" title="Judes ${us[i]}"></div>
+      <div class="per-bar o" style="height:${ho}px" title="Opp ${opp[i]}"></div>
+    </div><div class="per-lbl">${PL[i]}</div></div>`;
+  }
+  el.innerHTML=h;
+}
+
+function buildPeriodTable(us,opp){
+  let h=`<div class="per-table"><div class="per-thead"><span>PERIOD</span><span style="text-align:center">JUDES</span><span style="text-align:center">OPP</span><span style="text-align:center">DIFF</span></div>`;
+  for(let i=0;i<6;i++){
+    const diff=us[i]-opp[i];
+    const dc=diff>0?'dp':diff<0?'dn':'dz';
+    h+=`<div class="per-trow"><span style="color:var(--slate);font-family:monospace">${PL[i]}</span>
+      <span style="color:var(--gold);font-weight:700;text-align:center">${us[i]}</span>
+      <span style="text-align:center">${opp[i]}</span>
+      <span class="${dc}" style="text-align:center">${diff>0?'+':''}${diff}</span></div>`;
+  }
+  return h+'</div>';
+}
+
+function drawPitch(svgId, shots, filter){
+  const el=document.getElementById(svgId); if(!el)return;
+  const W=440,H=250;
+  let filtered=shots;
+  if(filter==='scored') filtered=shots.filter(s=>s.scored);
+  else if(filter==='missed') filtered=shots.filter(s=>!s.scored);
+  else if(filter==='free') filtered=shots.filter(s=>s.free);
+  const tot=filtered.length;
+  const scd=filtered.filter(s=>s.scored).length;
+  const statsEl=document.getElementById(svgId.replace('-svg','-stats'));
+  if(statsEl) statsEl.innerHTML=`
+    <div class="hstat"><div class="hstat-v">${tot}</div><div class="hstat-l">SHOTS</div></div>
+    <div class="hstat"><div class="hstat-v">${scd}</div><div class="hstat-l">SCORED</div></div>
+    <div class="hstat"><div class="hstat-v">${tot?Math.round(scd/tot*100):0}%</div><div class="hstat-l">CONV</div></div>`;
+  const gx=W-13,gy=H/2;
+  let svg=`<rect width="${W}" height="${H}" fill="#0a1a10" rx="7"/>`;
+  for(let i=0;i<6;i++) svg+=`<rect x="${i*(W/6)}" width="${W/6}" height="${H}" fill="${i%2===0?'#0c1f12':'#0a1a10'}" opacity="0.45"/>`;
+  svg+=`<rect x="12" y="12" width="${W-24}" height="${H-24}" fill="none" stroke="#2a4a30" stroke-width="1.5" rx="3"/>
+  <line x1="${W/2}" y1="12" x2="${W/2}" y2="${H-12}" stroke="#2a4a30" stroke-width="1"/>
+  <circle cx="${W/2}" cy="${H/2}" r="24" fill="none" stroke="#2a4a30" stroke-width="1"/>
+  <path d="M ${W-12} ${H*.15} Q ${W*.56} ${H/2} ${W-12} ${H*.85}" fill="none" stroke="#2a4a30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="${W*.82}" y1="12" x2="${W*.82}" y2="${H-12}" stroke="#2a4a30" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="${W-12}" y1="${H*.38}" x2="${W-12}" y2="${H*.62}" stroke="#aaffaa" stroke-width="3"/>
+  <line x1="${W-12}" y1="${H*.38}" x2="${W-24}" y2="${H*.38}" stroke="#aaffaa" stroke-width="1.5"/>
+  <line x1="${W-12}" y1="${H*.62}" x2="${W-24}" y2="${H*.62}" stroke="#aaffaa" stroke-width="1.5"/>
+  <rect x="${W-24}" y="${H*.29}" width="12" height="${H*.42}" fill="none" stroke="#2a4a30"/>`;
+  filtered.forEach(s=>{
+    const sx=s.x*W, sy=s.y*H;
+    let col=s.scored?(s.goal?'#f5c518':s.free?NEON:'#34c967'):'#ff5533';
+    const op=s.scored?.82:.45;
+    const dash=s.scored?'':'stroke-dasharray="3,2"';
+    const sw=s.goal?2.5:s.scored?1.5:1;
+    svg+=`<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${gx}" y2="${gy}" stroke="${col}" stroke-width="${sw}" ${dash} opacity="${op}"/>`;
+    svg+=`<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="${s.goal?4.5:3.5}" fill="${col}" opacity="${op}" stroke="${C_bg}" stroke-width=".5"/>`;
+  });
+  el.innerHTML=svg;
+}
+
+function drawPO(svgId, pos, filter){
+  const el=document.getElementById(svgId); if(!el)return;
+  const W=440,H=250;
+  let filtered=pos;
+  if(filter==='won') filtered=pos.filter(p=>p.won);
+  else if(filter==='lost') filtered=pos.filter(p=>!p.won);
+  let svg=`<rect width="${W}" height="${H}" fill="#0a1a10" rx="7"/>`;
+  for(let i=0;i<6;i++) svg+=`<rect x="${i*(W/6)}" width="${W/6}" height="${H}" fill="${i%2===0?'#0c1f12':'#0a1a10'}" opacity="0.45"/>`;
+  svg+=`<rect x="12" y="12" width="${W-24}" height="${H-24}" fill="none" stroke="#2a4a30" stroke-width="1.5" rx="3"/>
+  <line x1="${W/2}" y1="12" x2="${W/2}" y2="${H-12}" stroke="#2a4a30" stroke-width="1"/>
+  <circle cx="${W/2}" cy="${H/2}" r="24" fill="none" stroke="#2a4a30" stroke-width="1"/>
+  <line x1="${W-12}" y1="${H*.38}" x2="${W-12}" y2="${H*.62}" stroke="#aaffaa" stroke-width="3"/>
+  <line x1="${W-12}" y1="${H*.38}" x2="${W-24}" y2="${H*.38}" stroke="#aaffaa" stroke-width="1.5"/>
+  <line x1="${W-12}" y1="${H*.62}" x2="${W-24}" y2="${H*.62}" stroke="#aaffaa" stroke-width="1.5"/>`;
+  // PO origin marker (13m from goal on right)
+  const ox=(1-0.08)*W, oy=H/2;
+  svg+=`<circle cx="${ox.toFixed(0)}" cy="${oy}" r="5" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="2,2"/>`;
+  filtered.forEach(p=>{
+    const px=p.x*W, py=p.y*H;
+    const col=p.won?'#34c967':'#e04545';
+    svg+=`<line x1="${ox.toFixed(0)}" y1="${oy}" x2="${px.toFixed(1)}" y2="${py.toFixed(1)}" stroke="${col}" stroke-width="1.2" opacity="0.6"/>`;
+    svg+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${col}" opacity="0.8" stroke="${C_bg}" stroke-width=".5"/>`;
+  });
+  el.innerHTML=svg;
+}
+
+function buildPoGrid(gridData, elId){
+  const el=document.getElementById(elId); if(!el)return;
+  const dists=['Short','Mid','Long'];
+  const sides=['Left','Centre','Right'];
+  let h=`<div class="po-cell hdr-cell"></div>
+    <div class="po-cell hdr-cell">LEFT</div>
+    <div class="po-cell hdr-cell">CENTRE</div>
+    <div class="po-cell hdr-cell">RIGHT</div>`;
+  dists.forEach(d=>{
+    h+=`<div class="po-cell hdr-cell">${d.toUpperCase()}</div>`;
+    sides.forEach(s=>{
+      const k=d+'_'+s;
+      const cell=gridData[k]||{pct:null,won:0,total:0,color:'#1e2240'};
+      const pct=cell.pct!=null?cell.pct+'%':'—';
+      h+=`<div class="po-cell" style="background:${cell.color}22;border:1px solid ${cell.color}44">
+        <div class="po-pct" style="color:${cell.color}">${pct}</div>
+        <div class="po-sub">${cell.won}/${cell.total}</div>
+      </div>`;
+    });
+  });
+  el.innerHTML=h;
+}
+
+function buildSpeedBar(elId){
+  const el=document.getElementById(elId); if(!el)return;
+  const spd=D.poSpeed;
+  const maxSpd=100;
+  function bar(label,data,col){
+    if(!data||data.avg==null) return `<div class="spd-row"><div class="spd-lbl">${label}</div><div style="font-size:11px;color:var(--slate)">Insufficient data</div></div>`;
+    const w=Math.round(data.avg/maxSpd*100);
+    const p10w=Math.round(data.p10/maxSpd*100);
+    const p90w=Math.round(data.p90/maxSpd*100);
+    return `<div class="spd-row">
+      <div class="spd-lbl">${label}</div>
+      <div class="spd-bar-bg">
+        <div style="position:absolute;left:${p10w}%;width:${p90w-p10w}%;height:100%;background:${col};opacity:0.25;border-radius:3px"></div>
+        <div style="position:absolute;left:${Math.round(data.p10/maxSpd*100)}%;top:0;height:100%;width:2px;background:${col};opacity:0.6"></div>
+        <div style="position:absolute;left:${w}%;top:-3px;transform:translateX(-50%);width:8px;height:20px;background:${col};border-radius:2px"></div>
+        <div style="position:absolute;left:${Math.round(data.p90/maxSpd*100)}%;top:0;height:100%;width:2px;background:${col};opacity:0.6"></div>
+      </div>
+      <div class="spd-val">${data.avg}s</div>
+    </div>`;
+  }
+  el.innerHTML=`
+    <div class="spd-wrap">
+      <div class="spd-title">POST-SCORE RESTART (p10 ──── avg ──── p90)</div>
+      ${bar('Judes',spd.us_score,NEON)}
+      ${bar('Opposition',spd.opp_score,'#7a85aa')}
+    </div>
+    <div class="spd-wrap" style="margin-top:10px">
+      <div class="spd-title">POST-WIDE RESTART</div>
+      ${bar('Judes',spd.us_wide,NEON)}
+      ${bar('Opposition',spd.opp_wide,'#7a85aa')}
+    </div>
+    <div style="font-size:10px;color:var(--slate);margin-top:8px">Times reflect full elapsed game clock between shot event and puck-out event, including referee whistle and player positioning.</div>`;
+}
+
+function buildMatrix(elId){
+  const el=document.getElementById(elId); if(!el)return;
+  const km=D.koMatrix;
+  if(!km.total){el.innerHTML='<div style="color:var(--slate);font-size:12px">Insufficient data for matrix</div>';return}
+  const dists=['Short','Mid','Long'];
+  const speeds=['Fast','Med','Slow'];
+  let h=`<div class="mx-cell hdr"></div>
+    <div class="mx-cell hdr">FAST<br><span style="font-size:8px">&lt;${km.thresholds.fast}s</span></div>
+    <div class="mx-cell hdr">MED</div>
+    <div class="mx-cell hdr">SLOW<br><span style="font-size:8px">&gt;${km.thresholds.slow}s</span></div>`;
+  dists.forEach(d=>{
+    h+=`<div class="mx-cell hdr">${d.toUpperCase()}</div>`;
+    speeds.forEach(s=>{
+      const k=d+'_'+s;
+      const cell=km.matrix[k]||{pct:null,won:0,total:0,color:'#1e2240'};
+      const pct=cell.pct!=null?cell.pct+'%':'—';
+      h+=`<div class="mx-cell" style="background:${cell.color}22;border:1px solid ${cell.color}44">
+        <div class="mx-pct" style="color:${cell.color}">${pct}</div>
+        <div class="mx-sub">${cell.won}/${cell.total}</div>
+      </div>`;
+    });
+  });
+  el.innerHTML=h;
+  document.getElementById('ko-total').textContent=km.total;
+  const t=km.thresholds;
+  document.getElementById('ko-thresholds').textContent='Fast = <'+t.fast+'s · Slow = >'+t.slow+'s · based on season terciles';
+}
+
+// ── FILTER STATE ──────────────────────────────────────────
+const shotFilters={season:'all',match:'all',latest:'all'};
+const poFilters={'season-us':'all','season-opp':'all','match-us':'all','latest-us':'all'};
+
+function setShotFilter(f,btn,ctx){
+  shotFilters[ctx]=f;
+  btn.closest('.toggle-row').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(ctx==='season') drawPitch('season-shot-svg',D.seasonShotsUs,f);
+  else if(ctx==='match') drawPitch('match-shot-us-svg',currentMatchShots,f);
+  else if(ctx==='latest') drawPitch('latest-shot-us-svg',D.latestMatch.shots_us,f);
+}
+function setPoFilter(f,btn,ctx){
+  poFilters[ctx]=f;
+  btn.closest('.toggle-row').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(ctx==='season-us') drawPO('season-po-us-svg',D.seasonPoUs,f);
+  else if(ctx==='season-opp') drawPO('season-po-opp-svg',D.seasonPoOpp,f);
+  else if(ctx==='match-us') drawPO('match-po-us-svg',currentMatchPoUs,f);
+  else if(ctx==='latest-us') drawPO('latest-po-us-svg',D.latestMatch.po_us,f);
+}
+
+// ── TAB 1 BUILD ───────────────────────────────────────────
+function buildAllTab(){
+  const r=D.record;
+  document.getElementById('all-rec').textContent=r.W+'W '+r.D+'D '+r.L+'L';
+  const conv=Math.round(D.seasonShotsUs.filter(s=>s.scored).length/D.seasonShotsUs.length*100);
+  const po_pct=Math.round(D.seasonPoWonUs.w/D.seasonPoWonUs.t*100);
+  document.getElementById('all-hgrid').innerHTML=`
+    <div class="hstat"><div class="hstat-v">${Math.round(r.W/(r.W+r.D+r.L)*100)}%</div><div class="hstat-l">WIN RATE</div></div>
+    <div class="hstat"><div class="hstat-v">${r.ptsFor}</div><div class="hstat-l">PTS SCORED</div></div>
+    <div class="hstat"><div class="hstat-v">${conv}%</div><div class="hstat-l">SHOT CONV</div></div>
+    <div class="hstat"><div class="hstat-v">${po_pct}%</div><div class="hstat-l">PO RETENTION</div></div>`;
+
+  // Results
+  let rh='';
+  D.allMatches.forEach(m=>{
+    rh+=`<div class="rrow">
+      <div class="rbadge ${m.result}">${m.result}</div>
+      <div class="rinfo"><div class="ropp">v ${m.opp}</div><div class="rmeta">${m.date} · Rd ${m.rd} · ${m.comp}</div></div>
+      <div class="rscore">${sc_str(m.jg,m.jp)}<br><span style="color:var(--slate);font-size:10px">${sc_str(m.og,m.op)}</span></div>
+    </div>`;
+  });
+  document.getElementById('all-results').innerHTML=rh;
+
+  // Season compare
+  let ch='';
+  D.seasonCompare.forEach(s=>{
+    const tot=s.us+s.opp||1;
+    const pct=s.lower_better?Math.round(s.opp/tot*100):Math.round(s.us/tot*100);
+    const usBetter=s.lower_better?s.us<=s.opp:s.us>=s.opp;
+    ch+=`<div class="sbar-wrap">
+      <div class="sbar-lbls">
+        <span style="color:${usBetter?NEON:'var(--slate)'};font-weight:${usBetter?700:400}">${s.us}</span>
+        <span class="lbl">${s.label}</span>
+        <span style="color:${!usBetter?NEON:'var(--slate)'}">${s.opp}</span>
+      </div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  });
+  document.getElementById('all-scomp').innerHTML=ch;
+
+  // From play vs free
+  document.getElementById('all-fp').innerHTML=`
+    <div class="fp-card"><div class="fp-val">${D.playScoreUs}</div><div class="fp-lbl">SCORES FROM PLAY</div></div>
+    <div class="fp-card"><div class="fp-val">${D.freeScoreUs}</div><div class="fp-lbl">SCORES FROM FREES</div></div>
+    <div class="fp-card"><div class="fp-val">${D.freeDependUs}%</div><div class="fp-lbl">FREE DEPENDENCY</div></div>
+    <div class="fp-card" style="border-color:rgba(91,163,224,.2)"><div class="fp-val" style="color:var(--slate)">${D.freeDependOpp}%</div><div class="fp-lbl">OPP FREE DEP</div></div>`;
+
+  // Period chart
+  buildPeriodChart('all-perchart',D.periodScoring.seasonUs,D.periodScoring.seasonOpp);
+
+  // Scorers
+  let sh='';
+  D.seasonScorers.forEach((sc,i)=>{
+    sh+=`<div class="scrow">
+      <div class="scrk">${i+1}</div>
+      <div class="scname">${sc.name}</div>
+      <div><span class="scscore">${sc.score}</span>${sc.frees?'<span style="font-size:10px;color:var(--slate);margin-left:4px">'+sc.frees+'</span>':''}</div>
+      <div class="sctot">${sc.tot}pts · ${sc.mp}gm</div>
+    </div>`;
+  });
+  document.getElementById('all-scorers').innerHTML=sh;
+
+  // Contacts
+  let conth='';
+  D.seasonContacts.slice(0,10).forEach((c,i)=>{
+    conth+=`<div class="ctrow">
+      <span style="color:var(--gold);font-family:monospace;font-weight:700">${i+1}</span>
+      <span>${c.name}</span>
+      <span style="text-align:center;color:var(--slate)">${c.mp}</span>
+      <span style="text-align:center;color:var(--gold);font-weight:700">${c.count}</span>
+      <span style="text-align:center;color:var(--slate)">${c.pg}</span>
+    </div>`;
+  });
+  document.getElementById('all-contacts').innerHTML=conth;
+
+  // Shot map
+  drawPitch('season-shot-svg',D.seasonShotsUs,'all');
+  document.getElementById('shot-stats-s').innerHTML=`
+    <div class="hstat"><div class="hstat-v">${D.seasonShotsUs.length}</div><div class="hstat-l">SHOTS</div></div>
+    <div class="hstat"><div class="hstat-v">${D.seasonShotsUs.filter(s=>s.scored).length}</div><div class="hstat-l">SCORED</div></div>
+    <div class="hstat"><div class="hstat-v">${Math.round(D.seasonShotsUs.filter(s=>s.scored).length/D.seasonShotsUs.length*100)}%</div><div class="hstat-l">CONV</div></div>`;
+
+  // Zones
+  function buildZones(zones,elId){
+    let zh='';
+    zones.forEach(z=>{
+      zh+=`<div class="zone-card" style="border-color:${z.color}44">
+        <div class="zone-pct" style="color:${z.color}">${z.pct}%</div>
+        <div class="zone-lbl">${z.label}</div>
+        <div class="zone-sub">${z.scored}/${z.total} scored</div>
+      </div>`;
+    });
+    document.getElementById(elId).innerHTML=zh;
+  }
+  buildZones(D.seasonZonesUs,'all-zones-us');
+  buildZones(D.seasonZonesOpp,'all-zones-opp');
+
+  // PO maps
+  drawPO('season-po-us-svg',D.seasonPoUs,'all');
+  drawPO('season-po-opp-svg',D.seasonPoOpp,'all');
+  buildPoGrid(D.seasonPoGridUs,'po-grid-us');
+  buildPoGrid(D.seasonPoGridOpp,'po-grid-opp');
+
+  // Speed
+  buildSpeedBar('all-pospeed');
+
+  // Matrix
+  buildMatrix('ko-matrix');
+
+  // Commentary
+  let comh='';
+  D.seasonCommentary.forEach(c=>{
+    comh+=`<div class="com-item"><span class="com-dot">▸</span><span>${c}</span></div>`;
+  });
+  document.getElementById('all-commentary').innerHTML=comh;
+}
+
+// ── MATCH SELECT BUILD ────────────────────────────────────
+let currentMatchShots=[];
+let currentMatchPoUs=[];
+
+function buildMatchSelect(){
+  let opts='';
+  D.allMatches.forEach((m,i)=>{
+    opts+=`<option value="${i}">Rd ${m.rd} · ${m.date} — v ${m.opp} (${m.result} ${sc_str(m.jg,m.jp)}-${sc_str(m.og,m.op)})</option>`;
+  });
+  document.getElementById('match-select').innerHTML=opts;
+  // Default to latest
+  document.getElementById('match-select').value=D.allMatches.length-1;
+  renderMatch();
+}
+
+function renderMatch(){
+  const idx=parseInt(document.getElementById('match-select').value);
+  const m=D.allMatches[idx];
+  currentMatchShots=m.shots_us||[];
+  currentMatchPoUs=m.po_us||[];
+  const rcol=DC[m.result]||'var(--slate)';
+  const rword={W:'WIN',L:'LOSS',D:'DRAW'}[m.result];
+  const jpo_pct=m.jpo_total?Math.round(m.jpo_won/m.jpo_total*100):0;
+  const opo_pct=m.opo_total?Math.round(m.opo_won/m.opo_total*100):0;
+
+  let sch='';
+  (m.scorers||[]).forEach(s=>{
+    sch+=`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <span>${s.name}</span>
+      <span><span style="color:var(--gold);font-family:monospace;font-weight:700">${s.score}</span>${s.frees?'<span style="color:var(--slate);font-size:10px;margin-left:5px">'+s.frees+'</span>':''}</span>
+    </div>`;
+  });
+
+  let scbar='';
+  [
+    {label:'Shots',us:m.jshots,opp:m.oshots,lb:false},
+    {label:'Shot conversion %',us:m.jconv,opp:m.oconv,lb:false},
+    {label:'Own PO retention %',us:jpo_pct,opp:opo_pct,lb:false},
+    {label:'Turnovers lost',us:m.jpl,opp:m.opl,lb:true},
+    {label:'Productivity /10 poss',us:m.prod_us,opp:m.prod_opp,lb:false},
+  ].forEach(s=>{
+    const tot=s.us+s.opp||1;
+    const pct=s.lb?Math.round(s.opp/tot*100):Math.round(s.us/tot*100);
+    const ub=s.lb?s.us<=s.opp:s.us>=s.opp;
+    scbar+=`<div class="sbar-wrap">
+      <div class="sbar-lbls">
+        <span style="color:${ub?NEON:'var(--slate)'};font-weight:${ub?700:400}">${s.us}</span>
+        <span class="lbl">${s.label}</span>
+        <span style="color:${!ub?NEON:'var(--slate)'}">${s.opp}</span>
+      </div>
+      <div class="sbar-bg"><div class="sbar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  });
+
+  document.getElementById('match-content').innerHTML=`
+    <div class="score-card">
+      <div style="font-size:9px;font-family:monospace;letter-spacing:3px;color:var(--slate);margin-bottom:9px">${m.date} · Rd ${m.rd} · ${m.comp}</div>
+      <div style="font-size:12px;color:var(--slate);margin-bottom:5px">St Judes Camogie</div>
+      <div style="font-size:36px;font-weight:900;color:var(--gold);letter-spacing:-1px">${sc_str(m.jg,m.jp)}</div>
+      <div style="font-size:10px;color:var(--slate);margin:3px 0">(${m.jg*3+m.jp} pts · ${m.jfg}g ${m.jfp}f from frees)</div>
+      <div style="width:36px;height:1px;background:var(--border);margin:10px auto"></div>
+      <div style="font-size:12px;color:var(--slate);margin-bottom:5px">${m.opp}</div>
+      <div style="font-size:26px;font-weight:700;color:var(--slate)">${sc_str(m.og,m.op)}</div>
+      <div style="font-size:10px;color:var(--slate);margin:3px 0">(${m.og*3+m.op} pts)</div>
+      <div style="margin-top:13px;display:inline-block;padding:5px 18px;background:${rcol}22;border:1px solid ${rcol}55;border-radius:20px;font-size:12px;font-weight:700;color:${rcol};font-family:monospace">${rword}</div>
+    </div>
+
+    <div class="card"><div class="ct">SCORERS</div>${sch||'<div style="color:var(--slate);font-size:12px">No individual scores recorded</div>'}</div>
+
+    <div class="card"><div class="ct">TEAM COMPARISON</div>${scbar}</div>
+
+    <div class="card">
+      <div class="ct">SCORING BY 10-MINUTE PERIOD</div>
+      <div class="per-chart" id="match-perchart"></div>
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:8px">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span style="font-size:11px">St Judes</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:#1a1e38"></div><span style="font-size:11px">${m.opp}</span></div>
+      </div>
+      ${buildPeriodTable(m.periods_us,m.periods_opp)}
+    </div>
+
+    <div class="card">
+      <div class="ct">SHOT MAP — ST JUDES</div>
+      <div class="toggle-row">
+        <button class="fbtn active" onclick="setShotFilter('all',this,'match')">All</button>
+        <button class="fbtn" onclick="setShotFilter('scored',this,'match')">Scored</button>
+        <button class="fbtn" onclick="setShotFilter('missed',this,'match')">Missed</button>
+        <button class="fbtn" onclick="setShotFilter('free',this,'match')">From Free</button>
+      </div>
+      <div class="pitch-wrap"><svg id="match-shot-us-svg" class="pitch" viewBox="0 0 440 250"></svg></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px" id="match-shot-us-stats"></div>
+    </div>
+
+    <div class="card">
+      <div class="ct">PUCK-OUT MAP — ST JUDES</div>
+      <div class="toggle-row">
+        <button class="fbtn active" onclick="setPoFilter('all',this,'match-us')">All</button>
+        <button class="fbtn" onclick="setPoFilter('won',this,'match-us')">Won</button>
+        <button class="fbtn" onclick="setPoFilter('lost',this,'match-us')">Lost</button>
+      </div>
+      <div class="pitch-wrap"><svg id="match-po-us-svg" class="pitch" viewBox="0 0 440 250"></svg></div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div><span>Won (${m.jpo_won}/${m.jpo_total} · ${jpo_pct}%)</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div><span>Lost</span></div>
+      </div>
+    </div>`;
+
+  buildPeriodChart('match-perchart',m.periods_us,m.periods_opp);
+  drawPitch('match-shot-us-svg',currentMatchShots,'all');
+  document.getElementById('match-shot-us-stats').innerHTML=`
+    <div class="hstat"><div class="hstat-v">${m.jshots}</div><div class="hstat-l">SHOTS</div></div>
+    <div class="hstat"><div class="hstat-v">${m.jscored}</div><div class="hstat-l">SCORED</div></div>
+    <div class="hstat"><div class="hstat-v">${m.jconv}%</div><div class="hstat-l">CONV</div></div>`;
+  drawPO('match-po-us-svg',currentMatchPoUs,'all');
+}
+
+// ── LATEST MATCH ──────────────────────────────────────────
+function buildLatestTab(){
+  const m=D.latestMatch;
+  const idx=D.allMatches.findIndex(x=>x.opp===m.opp&&x.date===m.date);
+  // Set match select to latest and render into latest tab
+  const rcol=DC[m.result]||'var(--slate)';
+  const rword={W:'WIN',L:'LOSS',D:'DRAW'}[m.result];
+  const jpo_pct=m.jpo_total?Math.round(m.jpo_won/m.jpo_total*100):0;
+
+  let sch='';
+  (m.scorers||[]).forEach(s=>{
+    sch+=`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <span>${s.name}</span>
+      <span><span style="color:var(--gold);font-family:monospace;font-weight:700">${s.score}</span>${s.frees?'<span style="color:var(--slate);font-size:10px;margin-left:5px">'+s.frees+'</span>':''}</span>
+    </div>`;
+  });
+
+  document.getElementById('latest-content').innerHTML=`
+    <div class="score-card">
+      <div style="font-size:9px;font-family:monospace;letter-spacing:3px;color:var(--slate);margin-bottom:9px">${m.date} · ${m.comp} · LATEST MATCH</div>
+      <div style="font-size:12px;color:var(--slate);margin-bottom:5px">St Judes Camogie</div>
+      <div style="font-size:36px;font-weight:900;color:var(--gold);letter-spacing:-1px">${sc_str(m.jg,m.jp)}</div>
+      <div style="font-size:10px;color:var(--slate);margin:3px 0">(${m.jg*3+m.jp} pts · ${m.jfg}g ${m.jfp}f from frees)</div>
+      <div style="width:36px;height:1px;background:var(--border);margin:10px auto"></div>
+      <div style="font-size:12px;color:var(--slate);margin-bottom:5px">${m.opp}</div>
+      <div style="font-size:26px;font-weight:700;color:var(--slate)">${sc_str(m.og,m.op)}</div>
+      <div style="margin-top:13px;display:inline-block;padding:5px 18px;background:${rcol}22;border:1px solid ${rcol}55;border-radius:20px;font-size:12px;font-weight:700;color:${rcol};font-family:monospace">${rword}</div>
+    </div>
+
+    <div class="card"><div class="ct">SCORERS</div>${sch}</div>
+
+    <div class="card">
+      <div class="ct">SCORING BY PERIOD</div>
+      <div class="per-chart" id="latest-perchart"></div>
+      ${buildPeriodTable(m.periods_us,m.periods_opp)}
+    </div>
+
+    <div class="card">
+      <div class="ct">SHOT MAP — ST JUDES</div>
+      <div class="toggle-row">
+        <button class="fbtn active" onclick="setShotFilter('all',this,'latest')">All</button>
+        <button class="fbtn" onclick="setShotFilter('scored',this,'latest')">Scored</button>
+        <button class="fbtn" onclick="setShotFilter('missed',this,'latest')">Missed</button>
+        <button class="fbtn" onclick="setShotFilter('free',this,'latest')">From Free</button>
+      </div>
+      <div class="pitch-wrap"><svg id="latest-shot-us-svg" class="pitch" viewBox="0 0 440 250"></svg></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+        <div class="hstat"><div class="hstat-v">${m.jshots}</div><div class="hstat-l">SHOTS</div></div>
+        <div class="hstat"><div class="hstat-v">${m.jscored}</div><div class="hstat-l">SCORED</div></div>
+        <div class="hstat"><div class="hstat-v">${m.jconv}%</div><div class="hstat-l">CONV</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">PUCK-OUT MAP — ST JUDES</div>
+      <div class="toggle-row">
+        <button class="fbtn active" onclick="setPoFilter('all',this,'latest-us')">All</button>
+        <button class="fbtn" onclick="setPoFilter('won',this,'latest-us')">Won</button>
+        <button class="fbtn" onclick="setPoFilter('lost',this,'latest-us')">Lost</button>
+      </div>
+      <div class="pitch-wrap"><svg id="latest-po-us-svg" class="pitch" viewBox="0 0 440 250"></svg></div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div><span>Won (${m.jpo_won}/${m.jpo_total} · ${jpo_pct}%)</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div><span>Lost</span></div>
+      </div>
+    </div>
+
+    <div class="commentary">
+      <div class="com-eye">◉ MATCH ANALYSIS</div>
+      <div id="latest-commentary"></div>
+    </div>`;
+
+  buildPeriodChart('latest-perchart',m.periods_us,m.periods_opp);
+  drawPitch('latest-shot-us-svg',m.shots_us||[],'all');
+  drawPO('latest-po-us-svg',m.po_us||[],'all');
+
+  let comh='';
+  D.latestCommentary.forEach(c=>{
+    comh+=`<div class="com-item"><span class="com-dot">▸</span><span>${c}</span></div>`;
+  });
+  document.getElementById('latest-commentary').innerHTML=comh;
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────
+function showTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+buildAllTab();
+buildMatchSelect();
+buildLatestTab();
+</script>
+</body>
+</html>
