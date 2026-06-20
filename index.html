@@ -1003,8 +1003,8 @@ function renderPeriodChart(svgId, bray, opp, labels){
     const diff=bray[i]-opp[i];
 
     // Bray bar (left)
-    s+=`<rect x="${cx-barW-gap/2}" y="${bY}" width="${barW}" height="${bH}" fill="#34c967" rx="3" opacity="0.85"/>`;
-    if(bray[i]>0) s+=`<text x="${cx-barW/2-gap/2}" y="${bY-4}" font-size="9" fill="#34c967" text-anchor="middle" font-family="monospace" font-weight="800">${bray[i]}</text>`;
+    s+=`<rect x="${cx-barW-gap/2}" y="${bY}" width="${barW}" height="${bH}" fill="#5ba3e0" rx="3" opacity="0.85"/>`;
+    if(bray[i]>0) s+=`<text x="${cx-barW/2-gap/2}" y="${bY-4}" font-size="9" fill="#5ba3e0" text-anchor="middle" font-family="monospace" font-weight="800">${bray[i]}</text>`;
 
     // Opp bar (right)
     s+=`<rect x="${cx+gap/2}" y="${oY}" width="${barW}" height="${oH}" fill="#7a90aa" rx="3" opacity="0.5"/>`;
@@ -1030,7 +1030,7 @@ const diffs=ps.labels.map((_,i)=>ps.seasonBray[i]-ps.seasonOpp[i]);
 const bestIdx=diffs.indexOf(Math.max(...diffs));
 const worstIdx=diffs.indexOf(Math.min(...diffs));
 document.getElementById('period-season-insight').textContent=
-  `Strongest period: ${ps.labels[bestIdx]} (Bray +${diffs[bestIdx]}). Weakest: ${ps.labels[worstIdx]} (${diffs[worstIdx]>=0?'+':''}${diffs[worstIdx]}). The first 10 minutes of the second half (30-40) is where Bray's dominance disappears — level on 22-22 across the season.`;
+  `Strongest period: ${ps.labels[bestIdx]} (St Judes +${diffs[bestIdx]}). Weakest: ${ps.labels[worstIdx]} (${diffs[worstIdx]>=0?'+':''}${diffs[worstIdx]}). The first 10 minutes of the second half (30-40) is where St Judes' advantage disappears — the key vulnerability window to address.`;
 
 // Latest match period chart
 const lps=LM.periodScoring;
