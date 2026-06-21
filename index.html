@@ -413,6 +413,7 @@ window.__RSA__ = {"resultsTable":[{"date":"25 Mar 2026","opp":"Erins Isle","us":
 
 
 
+
 const D = window.__RSA__;
 const LM = D.latestMatch;
 const NEON = {green:"#5ba3e0",red:"#e04545",purple:"#88c0f0",gold:"#88c0f0"};
@@ -835,36 +836,71 @@ function renderShotPitch(svgEl,pts,zones){
   svgEl.innerHTML=s;
 }
 function renderKoPitch(svgEl, pts){
-  // Full pitch portrait, dots only at raw contest location
+  // Full GAA pitch portrait, dots only at raw contest location
   const W=240, H=400, L=10, R=230, T=10, B=390;
   const pw=R-L, ph=B-T;
   let s=`<rect width="${W}" height="${H}" fill="#0a1a10" rx="5"/>`;
-  s+=`<rect x="1" y="1" width="${W-2}" height="${H-2}" fill="none" stroke="#1a3a1f" stroke-width="0.6" rx="5"/>`;
   // Pitch outline
   s+=`<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="none" stroke="#2a4a30" stroke-width="1.2"/>`;
-  // Centre line
-  s+=`<line x1="${L}" y1="${H/2}" x2="${R}" y2="${H/2}" stroke="#2a4a30" stroke-width="0.8"/>`;
-  // Centre circle
-  s+=`<circle cx="${W/2}" cy="${H/2}" r="22" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
-  // Top goal (x=0 end)
-  s+=`<line x1="${W/2-20}" y1="${T}" x2="${W/2+20}" y2="${T}" stroke="#aaffaa" stroke-width="2.5"/>`;
-  s+=`<rect x="${W/2-30}" y="${T}" width="60" height="20" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
-  s+=`<rect x="${W/2-16}" y="${T}" width="32" height="10" fill="none" stroke="#2a4a30" stroke-width="0.6"/>`;
-  s+=`<path d="M ${W/2-40} ${T+20} Q ${W/2} ${T+55} ${W/2+40} ${T+20}" fill="none" stroke="#2a4a30" stroke-width="0.7"/>`;
-  // Bottom goal (x=1 end)
-  s+=`<line x1="${W/2-20}" y1="${B}" x2="${W/2+20}" y2="${B}" stroke="#aaffaa" stroke-width="2.5"/>`;
-  s+=`<rect x="${W/2-30}" y="${B-20}" width="60" height="20" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
-  s+=`<rect x="${W/2-16}" y="${B-10}" width="32" height="10" fill="none" stroke="#2a4a30" stroke-width="0.6"/>`;
-  s+=`<path d="M ${W/2-40} ${B-20} Q ${W/2} ${B-55} ${W/2+40} ${B-20}" fill="none" stroke="#2a4a30" stroke-width="0.7"/>`;
-  // 45m lines from each end
-  s+=`<line x1="${L}" y1="${T+ph*0.31}" x2="${R}" y2="${T+ph*0.31}" stroke="#2a4a30" stroke-width="0.6" stroke-dasharray="2,2"/>`;
-  s+=`<line x1="${L}" y1="${B-ph*0.31}" x2="${R}" y2="${B-ph*0.31}" stroke="#2a4a30" stroke-width="0.6" stroke-dasharray="2,2"/>`;
-  // Play direction arrow (left side, pointing down = away from top goal)
-  const ax=5, ay1=T+30, ay2=B-30;
+  // Centre line (dashed)
+  s+=`<line x1="${L}" y1="${H/2}" x2="${R}" y2="${H/2}" stroke="#2a4a30" stroke-width="0.8" stroke-dasharray="4,3"/>`;
+
+  // === TOP END ===
+  // Goal
+  s+=`<line x1="${W/2-18}" y1="${T}" x2="${W/2+18}" y2="${T}" stroke="#aaffaa" stroke-width="2.5"/>`;
+  // Goalposts
+  s+=`<rect x="${W/2-3}" y="${T-6}" width="2" height="6" fill="#aaffaa"/>`;
+  s+=`<rect x="${W/2+1}" y="${T-6}" width="2" height="6" fill="#aaffaa"/>`;
+  // Small rectangle (parallelogram ~4.5m)
+  const tSmall=T+ph*0.035;
+  s+=`<rect x="${W/2-28}" y="${T}" width="56" height="${tSmall-T}" fill="none" stroke="#2a4a30" stroke-width="0.7"/>`;
+  // Large rectangle (13m)
+  const t13=T+ph*0.1;
+  s+=`<rect x="${W/2-50}" y="${T}" width="100" height="${t13-T}" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
+  // 13m arc (semicircle from goalposts)
+  const arcR=ph*0.1;
+  s+=`<path d="M ${W/2-50} ${t13} A ${arcR} ${arcR} 0 0 0 ${W/2+50} ${t13}" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
+  // 20m line
+  const t20=T+ph*0.154;
+  s+=`<line x1="${L}" y1="${t20}" x2="${R}" y2="${t20}" stroke="#2a4a30" stroke-width="0.7"/>`;
+  // 45m line
+  const t45=T+ph*0.346;
+  s+=`<line x1="${L}" y1="${t45}" x2="${R}" y2="${t45}" stroke="#2a4a30" stroke-width="0.7"/>`;
+  // 65m line
+  const t65=T+ph*0.5-ph*0.154;
+  s+=`<line x1="${L}" y1="${t65}" x2="${R}" y2="${t65}" stroke="#2a4a30" stroke-width="0.7"/>`;
+
+  // === BOTTOM END (mirror) ===
+  // Goal
+  s+=`<line x1="${W/2-18}" y1="${B}" x2="${W/2+18}" y2="${B}" stroke="#aaffaa" stroke-width="2.5"/>`;
+  // Goalposts
+  s+=`<rect x="${W/2-3}" y="${B}" width="2" height="6" fill="#aaffaa"/>`;
+  s+=`<rect x="${W/2+1}" y="${B}" width="2" height="6" fill="#aaffaa"/>`;
+  // Small rectangle
+  const bSmall=B-ph*0.035;
+  s+=`<rect x="${W/2-28}" y="${bSmall}" width="56" height="${B-bSmall}" fill="none" stroke="#2a4a30" stroke-width="0.7"/>`;
+  // Large rectangle (13m)
+  const b13=B-ph*0.1;
+  s+=`<rect x="${W/2-50}" y="${b13}" width="100" height="${B-b13}" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
+  // 13m arc
+  s+=`<path d="M ${W/2-50} ${b13} A ${arcR} ${arcR} 0 0 1 ${W/2+50} ${b13}" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
+  // 20m line
+  const b20=B-ph*0.154;
+  s+=`<line x1="${L}" y1="${b20}" x2="${R}" y2="${b20}" stroke="#2a4a30" stroke-width="0.7"/>`;
+  // 45m line
+  const b45=B-ph*0.346;
+  s+=`<line x1="${L}" y1="${b45}" x2="${R}" y2="${b45}" stroke="#2a4a30" stroke-width="0.7"/>`;
+  // 65m line
+  const b65=B-ph*0.5+ph*0.154;
+  s+=`<line x1="${L}" y1="${b65}" x2="${R}" y2="${b65}" stroke="#2a4a30" stroke-width="0.7"/>`;
+
+  // Play direction arrow
+  const ax=5, ay1=T+40, ay2=B-40;
   s+=`<line x1="${ax}" y1="${ay1}" x2="${ax}" y2="${ay2}" stroke="#3a5a40" stroke-width="1"/>`;
   s+=`<polygon points="${ax},${ay2+2} ${ax-3},${ay2-4} ${ax+3},${ay2-4}" fill="#3a5a40"/>`;
-  s+=`<text x="${ax}" y="${H/2}" font-size="7" fill="#3a5a40" font-family="monospace" text-anchor="middle" transform="rotate(-90,${ax},${H/2})">PUCK-OUT DIRECTION</text>`;
-  // Dots — raw coords: x=0..1 vertical (top to bottom), y=0..1 horizontal
+  s+=`<text x="${ax}" y="${H/2}" font-size="7" fill="#3a5a40" font-family="monospace" text-anchor="middle" transform="rotate(-90,${ax},${H/2})">PUCK-OUT</text>`;
+
+  // Dots
   pts.forEach(d=>{
     const px=L+(d[1]*pw), py=T+(d[0]*ph);
     const col=d[2]==='W'?NEON.green:NEON.red;
@@ -1115,6 +1151,7 @@ LM.tackles.forEach((p,i)=>{
   d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
   mtEl.appendChild(d);
 });
+
 
 
 
