@@ -491,8 +491,8 @@ function renderMatchReport(idx){
     <div class="view-tabs">
       <button class="view-tab active" data-pmview="mr${idx}-shots">Our Shots</button>
       <button class="view-tab" data-pmview="mr${idx}-opp">Opp Shots</button>
-      <button class="view-tab" data-pmview="mr${idx}-ko">Our KOs</button>
-      <button class="view-tab" data-pmview="mr${idx}-oppko">Opp KOs</button>
+      <button class="view-tab" data-pmview="mr${idx}-ko">Our POs</button>
+      <button class="view-tab" data-pmview="mr${idx}-oppko">Opp POs</button>
     </div>
     <div id="pm-mr${idx}-shots" class="pmview">
       <div class="card-sub" id="pm-mr${idx}-shots-sub"></div>
@@ -919,7 +919,7 @@ function renderKoGrid(el,grid){
       const d=document.createElement('div'); d.className='ko-cell';
       d.style.borderColor=cell.pct===null?'#111a2e':col+'55';
       d.style.background=cell.pct===null?'#080f20':col+'15';
-      d.innerHTML=`<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} KOs</div>`;
+      d.innerHTML=`<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} POs</div>`;
       el.appendChild(d);
     });
   });
@@ -945,12 +945,12 @@ function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, ko
     b.classList.toggle('off',!zoneState[prefix+'opp']);
   }
   function refreshKo(){
-    document.getElementById(`pm-${prefix}ko-sub`).textContent=`${koWonUs.total} OWN KOs · ${koWonUs.won} WON (${koWonUs.pct}%)`;
+    document.getElementById(`pm-${prefix}ko-sub`).textContent=`${koWonUs.total} OWN POs · ${koWonUs.won} WON (${koWonUs.pct}%)`;
     renderKoPitch(document.getElementById(`pitch-${prefix}ko`),koUs);
     renderKoGrid(document.getElementById(`ko-${prefix}grid`),koGridUs);
   }
   function refreshOppKo(){
-    document.getElementById(`pm-${prefix}oppko-sub`).textContent=`${koWonOpp.total} OPP KOs · ${koWonOpp.won} WON (${koWonOpp.pct}%)`;
+    document.getElementById(`pm-${prefix}oppko-sub`).textContent=`${koWonOpp.total} OPP POs · ${koWonOpp.won} WON (${koWonOpp.pct}%)`;
     renderKoPitch(document.getElementById(`pitch-${prefix}oppko`),koOpp);
     renderKoGrid(document.getElementById(`ko-${prefix}oppgrid`),koGridOpp);
   }
@@ -1036,7 +1036,7 @@ speedLabels.forEach((c,i)=>{
     div.className='ko-cell';
     div.style.borderColor = cell.pct===null ? '#111a2e' : col+'55';
     div.style.background = cell.pct===null ? '#080f20' : col+'15';
-    div.innerHTML=`<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} KOs</div>`;
+    div.innerHTML=`<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} POs</div>`;
     kmEl.appendChild(div);
   });
 });
