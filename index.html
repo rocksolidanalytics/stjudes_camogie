@@ -1104,4 +1104,655 @@ LM.tackles.forEach((p,i)=>{
 
 </script>
 </body>
+</html<div class=\"sb-meta\"><div class=\"sb-meta-line\">${M.meta.comp} · vs ${M.meta.opp}</div></div>
+      <div class="sb-row">
+        <div class="sb-team us"><div class="sb-team-name">Bray Emmets</div><div class="sb-score">${sl.us.main}</div><div class="sb-frees">frees ${sl.us.frees}</div></div>
+        <div class="sb-vs">v</div>
+        <div class="sb-team"><div class="sb-team-name">${M.meta.opp}</div><div class="sb-score">${sl.them.main}</div></div>
+      </div>
+      ${twoPtLine}
+      <div class="result-banner" style="color:${resCol};background:${resBg};border-color:${resBorder};">${resText}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Score Progression</div>
+    <div class="timeline-wrap"><svg id="mr-timeline-${idx}" viewBox="0 0 600 200" style="width:100%;display:block;" preserveAspectRatio="xMidYMid meet"></svg></div>
+    <div class="legend"><span><i class="dot" style="background:var(--green)"></i>St Judes</span><span><i class="dot" style="background:var(--text-dim)"></i>${M.meta.opp}</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Team Comparison</div>
+    <div id="mr-compare-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pitch Maps</div>
+    <div class="view-tabs">
+      <button class="view-tab active" data-pmview="mr${idx}-shots">Our Shots</button>
+      <button class="view-tab" data-pmview="mr${idx}-opp">Opp Shots</button>
+      <button class="view-tab" data-pmview="mr${idx}-ko">Our KOs</button>
+      <button class="view-tab" data-pmview="mr${idx}-oppko">Opp KOs</button>
+    </div>
+    <div id="pm-mr${idx}-shots" class="pmview">
+      <div class="card-sub" id="pm-mr${idx}-shots-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-shots" viewBox="0 0 240 200"></svg></div>
+      <button class="toggle-btn" id="ztog-mr${idx}-shots">◉ ZONE CONVERSION ON</button>
+      <div class="legend"><span><i class="dot" style="background:#00ff88"></i>Score</span><span><i class="dot" style="background:#cc44ff"></i>Goal</span><span><i class="dot" style="background:#ff3355"></i>Miss</span></div>
+    </div>
+    <div id="pm-mr${idx}-opp" class="pmview" style="display:none">
+      <div class="card-sub" id="pm-mr${idx}-opp-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-opp" viewBox="0 0 240 200"></svg></div>
+      <button class="toggle-btn" id="ztog-mr${idx}-opp">◉ ZONE CONVERSION ON</button>
+      <div class="legend"><span><i class="dot" style="background:#00ff88"></i>Score</span><span><i class="dot" style="background:#cc44ff"></i>Goal</span><span><i class="dot" style="background:#ff3355"></i>Miss</span></div>
+    </div>
+    <div id="pm-mr${idx}-ko" class="pmview" style="display:none">
+      <div class="card-sub" id="pm-mr${idx}-ko-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-ko" viewBox="0 0 240 200"></svg></div>
+      <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
+      <div class="card-title" style="margin-top:5px;">Kickout Win % by Zone</div>
+      <div class="ko-grid" id="ko-mr${idx}-grid"></div>
+    </div>
+    <div id="pm-mr${idx}-oppko" class="pmview" style="display:none">
+      <div class="card-sub" id="pm-mr${idx}-oppko-sub"></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-oppko" viewBox="0 0 240 200"></svg></div>
+      <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
+      <div class="card-title" style="margin-top:5px;">Opposition KO Win % by Zone</div>
+      <div class="ko-grid" id="ko-mr${idx}-oppgrid"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Scorers</div>
+    <div id="mr-scorers-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tackles &amp; Frees Conceded</div>
+    <div id="mr-tackles-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Possession Lost</div>
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:0.68rem;font-family:monospace;color:var(--green);margin-bottom:5px;">ST JUDES</div>
+        <svg viewBox="0 0 120 120" id="mr-donut-us-${idx}" style="width:100%;max-width:140px;"></svg>
+        <div id="mr-donut-us-leg-${idx}" style="margin-top:7px;"></div>
+      </div>
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:0.68rem;font-family:monospace;color:var(--text-dim);margin-bottom:5px;">${M.meta.opp.toUpperCase()}</div>
+        <svg viewBox="0 0 120 120" id="mr-donut-them-${idx}" style="width:100%;max-width:140px;"></svg>
+        <div id="mr-donut-them-leg-${idx}" style="margin-top:7px;"></div>
+      </div>
+    </div>
+  </div>`;
+
+  matchContainer.innerHTML = html;
+
+  // Render timeline
+  const tSvg = document.getElementById('mr-timeline-'+idx);
+  const tW=600,tH=200,pL=34,pR=14,pT=14,pB=28,ML=60;
+  const maxS=Math.max(...M.timeline.map(p=>Math.max(p.h,p.a)),1);
+  const tx=t=>pL+(t/ML)*(tW-pL-pR), ty=v=>tH-pB-(v/maxS)*(tH-pT-pB);
+  let ts='';
+  for(let v=0;v<=maxS;v+=Math.ceil(maxS/5)){
+    ts+=`<line x1="${pL}" y1="${ty(v)}" x2="${tW-pR}" y2="${ty(v)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    ts+=`<text x="${pL-6}" y="${ty(v)+4}" font-size="9" fill="#7a90aa" text-anchor="end">${v}</text>`;
+  }
+  ts+=`<line x1="${tx(30)}" y1="${pT}" x2="${tx(30)}" y2="${tH-pB}" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  ts+=`<text x="${tx(30)}" y="${tH-10}" font-size="9" fill="#7a90aa" text-anchor="middle">HT</text>`;
+  function mrPath(key,color){
+    let pts=[[0,0]]; M.timeline.forEach(p=>pts.push([p.m,p[key]])); pts.push([ML,pts[pts.length-1][1]]);
+    let d=`M ${tx(pts[0][0])} ${ty(pts[0][1])}`;
+    for(let i=1;i<pts.length;i++) d+=` L ${tx(pts[i][0])} ${ty(pts[i-1][1])} L ${tx(pts[i][0])} ${ty(pts[i][1])}`;
+    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+  }
+  ts+=mrPath('a','#7a90aa'); ts+=mrPath('h','#5ba3e0');
+  [0,15,45,60].forEach(t=>{ts+=`<text x="${tx(t)}" y="${tH-10}" font-size="9" fill="#7a90aa" text-anchor="middle">${t===0?"0'":t===60?"FT":t+"'"}</text>`;});
+  tSvg.innerHTML=ts;
+
+  // Render compare
+  renderCompare(document.getElementById('mr-compare-'+idx), M.compare);
+
+  // Pitch maps
+  setupPitchMap('mr'+idx+'-', M.shotsUs, M.shotsOpp, M.zonesUs, M.zonesOpp, M.koUs, M.koOpp, M.koGridUs, M.koGridOpp, M.koWonUs, M.koWonOpp);
+
+  // Re-bind view tabs within this card
+  matchContainer.querySelectorAll('.view-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const group=tab.closest('.card');
+      group.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+      group.querySelectorAll('.pmview').forEach(v=>v.style.display='none');
+      tab.classList.add('active');
+      document.getElementById('pm-'+tab.dataset.pmview).style.display='block';
+    });
+  });
+
+  // Scorers
+  const msEl2=document.getElementById('mr-scorers-'+idx);
+  M.scorers.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='lb-row';
+    d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.notation}</div><div class="lb-val">${p.total}</div>`;
+    msEl2.appendChild(d);
+  });
+
+  // Tackles
+  const mtEl2=document.getElementById('mr-tackles-'+idx);
+  M.tackles.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='lb-row';
+    d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
+    mtEl2.appendChild(d);
+  });
+
+  // Rucks
+  const rkEl=document.getElementById('mr-tackles-'+idx);
+  if(M.rucks && (M.rucks.jWon+M.rucks.jLost)>0){
+    const jTotal=M.rucks.jWon+M.rucks.jLost;
+    const jPct=Math.round(M.rucks.jWon/jTotal*100);
+    const rkDiv=document.createElement('div');
+    rkDiv.style.cssText='margin-top:10px;padding-top:10px;border-top:1px solid var(--border)';
+    rkDiv.innerHTML=`<div style="font-size:0.68rem;font-family:monospace;color:var(--text-dim);margin-bottom:6px;">RUCKS</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span style="font-size:0.68rem;color:var(--green);font-family:monospace;width:36px">JUDES</span>
+        <div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+          <div style="width:${jPct}%;height:100%;background:var(--green);opacity:0.8;border-radius:3px;"></div>
+        </div>
+        <span style="font-size:0.75rem;font-weight:800;color:var(--green);">${M.rucks.jWon}W / ${M.rucks.jLost}L (${jPct}%)</span>
+      </div>`;
+    rkEl.appendChild(rkDiv);
+  }
+
+  // Donuts
+  if(Object.keys(M.possLost.us).length) renderDonut(document.getElementById('mr-donut-us-'+idx), document.getElementById('mr-donut-us-leg-'+idx), M.possLost.us);
+  if(Object.keys(M.possLost.them).length) renderDonut(document.getElementById('mr-donut-them-'+idx), document.getElementById('mr-donut-them-leg-'+idx), M.possLost.them);
+}
+
+matchSelector.addEventListener('change', ()=> renderMatchReport(parseInt(matchSelector.value)));
+renderMatchReport(D.allMatches.length - 1);
+
+// ---- SEASON BANNER ----
+const rec=D.record;
+const n=D.resultsTable.length;
+const bannerEl=document.getElementById('banner-stats');
+const avgFor=Math.round(rec.ptsFor/n);
+const avgAg=Math.round(rec.ptsAg/n);
+const diff=rec.ptsFor-rec.ptsAg;
+const bannerStats=[
+  {num:`${rec.W}-${rec.D}-${rec.L}`, lbl:'W-D-L', col:'var(--green)'},
+  {num:n, lbl:'Played', col:'var(--text)'},
+  {num:avgFor, lbl:'Avg Scored', col:'var(--green)'},
+  {num:avgAg, lbl:'Avg Conceded', col:'var(--text-dim)'},
+  {num:(diff>=0?'+':'')+diff, lbl:'Points Diff', col:diff>=0?'var(--green)':'var(--red)'},
+  {num:Math.round(rec.ptsFor/(rec.ptsFor+rec.ptsAg)*100)+'%', lbl:'Score Share', col:'var(--green)'},
+];
+bannerStats.forEach(s=>{
+  const d=document.createElement('div'); d.className='stat-box';
+  d.innerHTML=`<div class="num" style="color:${s.col}">${s.num}</div><div class="lbl">${s.lbl}</div>`;
+  bannerEl.appendChild(d);
+});
+
+// ---- RESULTS TABLE ----
+const rl=document.getElementById('results-list');
+D.resultsTable.forEach(r=>{
+  const div=document.createElement('div'); div.className='result-item';
+  const tag=!r.tagged?'<span style="color:var(--text-dim);font-size:0.68rem;"> (no data)</span>':'';
+  div.innerHTML=`<div class="result-badge ${r.result}">${r.result}</div>
+    <div class="result-info"><div class="result-opp">Rd${r.rd} · ${r.opp}${tag}</div><div class="result-date">${r.date}</div></div>
+    <div class="result-score">${r.us}<br><span style="font-size:0.7rem;color:var(--text-dim)">v ${r.them}</span></div>`;
+  rl.appendChild(div);
+});
+
+// ---- SEASON SCORERS ----
+const ssl=document.getElementById('season-scorers');
+D.seasonScorers.slice(0,12).forEach((p,i)=>{
+  const d=document.createElement('div'); d.className='lb-row';
+  d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.notation}</div><div class="lb-val">${p.total}</div>`;
+  ssl.appendChild(d);
+});
+
+// ---- PLAYER STATS TABLE ----
+const ptEl = document.getElementById('player-table');
+// Header row
+const hdr = document.createElement('div');
+hdr.className='lb-row';
+hdr.style.borderBottom='2px solid var(--border)';
+hdr.innerHTML=`<div class="lb-rank" style="color:var(--text-dim);font-size:0.62rem;"></div>
+  <div class="lb-name" style="color:var(--text-dim);font-size:0.62rem;">PLAYER</div>
+  <div style="width:26px;text-align:center;font-size:0.58rem;color:var(--text-dim);flex-shrink:0;">MP</div>
+  <div style="width:26px;text-align:center;font-size:0.58rem;color:var(--text-dim);flex-shrink:0;">C</div>
+  <div style="width:28px;text-align:center;font-size:0.58rem;color:var(--text-dim);flex-shrink:0;">C/G</div>
+  <div style="width:26px;text-align:center;font-size:0.58rem;color:var(--text-dim);flex-shrink:0;">Sc</div>
+  <div style="width:28px;text-align:center;font-size:0.58rem;color:var(--text-dim);flex-shrink:0;">Sc/G</div>`;
+ptEl.appendChild(hdr);
+
+D.playerTable.forEach((p,i)=>{
+  const highT = p.tacklesPerGame >= 3.5;
+  const highSc = p.scorePerGame >= 2;
+  const highFC = p.frees >= 5;
+  const d = document.createElement('div');
+  d.className='lb-row';
+  d.innerHTML=`<div class="lb-rank">${i+1}</div>
+    <div class="lb-name">${p.name}</div>
+    <div style="width:26px;text-align:center;font-size:0.78rem;color:var(--text-dim);flex-shrink:0;">${p.mp}</div>
+    <div style="width:26px;text-align:center;font-size:0.78rem;font-weight:800;color:var(--green);flex-shrink:0;">${p.tackles}</div>
+    <div style="width:28px;text-align:center;font-size:0.72rem;color:${highT?'var(--green)':'var(--text-dim)'};flex-shrink:0;">${p.tacklesPerGame}</div>
+    <div style="width:26px;text-align:center;font-size:0.72rem;color:${highFC?'var(--red)':'var(--text-dim)'};flex-shrink:0;">${p.frees}</div>
+    <div style="width:26px;text-align:center;font-size:0.78rem;font-weight:${p.score>0?700:400};color:${p.score>0?'var(--text)':'var(--text-dim)'};flex-shrink:0;">${p.score||'—'}</div>
+    <div style="width:28px;text-align:center;font-size:0.72rem;color:${highSc?'var(--gold)':'var(--text-dim)'};flex-shrink:0;">${p.score>0?p.scorePerGame:'—'}</div>`;
+  ptEl.appendChild(d);
+});
+
+// ---- TACKLES BY MATCH ----
+const tbmEl = document.getElementById('tackles-by-match');
+D.contactsByMatch.forEach(m=>{
+  const max = Math.max(m.bray, m.oppCount, 1);
+  const div = document.createElement('div');
+  div.style.cssText='padding:8px 0;border-bottom:1px solid var(--border);';
+  div.innerHTML=`<div style="font-size:0.68rem;font-family:monospace;color:var(--text-dim);margin-bottom:5px;">RD${m.rd} ${m.oppName.toUpperCase()}</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+      <span style="width:36px;font-size:0.62rem;color:var(--green);font-family:monospace;">JUDES</span>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+        <div style="width:${m.bray/max*100}%;height:100%;background:var(--green);opacity:0.8;border-radius:3px;"></div>
+      </div>
+      <span style="width:24px;text-align:right;font-size:0.75rem;font-weight:800;color:var(--green);">${m.bray}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="width:36px;font-size:0.62rem;color:var(--text-dim);font-family:monospace;">OPP</span>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+        <div style="width:${m.oppCount/max*100}%;height:100%;background:var(--text-dim);opacity:0.5;border-radius:3px;"></div>
+      </div>
+      <span style="width:24px;text-align:right;font-size:0.75rem;font-weight:800;color:var(--text-dim);">${m.oppCount}</span>
+    </div>`;
+  tbmEl.appendChild(div);
+});
+document.getElementById('judes-contact-total').textContent = `Judes ${D.judesContactSeason}`;
+document.getElementById('opp-contact-total').textContent = `(opp contacts not tagged)`;
+
+// ---- COMMENTARY ----
+const scEl = document.getElementById('season-commentary');
+D.seasonCommentary.forEach(line=>{
+  const li = document.createElement('li'); li.textContent = line; scEl.appendChild(li);
+});
+const lcEl = document.getElementById('latest-commentary');
+D.latestCommentary.forEach(line=>{
+  const li = document.createElement('li'); li.textContent = line; lcEl.appendChild(li);
+});
+
+// ---- SEASON TACKLES (old element no longer in HTML — skip) ----
+
+
+// ---- COMPARE BARS ----
+function renderCompare(el, data){
+  data.forEach(c=>{
+    const wrap=document.createElement('div'); wrap.className='compare-row';
+    const max=Math.max(c.us,c.them,1);
+    wrap.innerHTML=`<div class="compare-label" style="grid-column:1/-1">${c.label}</div>
+      <div class="compare-val us">${c.usDisplay!==undefined?c.usDisplay:c.us}</div>
+      <div class="compare-bar-wrap">
+        <div class="compare-bar-us" style="width:${c.us/max*50}%;margin-left:${50-c.us/max*50}%"></div>
+        <div class="compare-bar-them" style="width:${c.them/max*50}%"></div>
+      </div>
+      <div class="compare-val them">${c.themDisplay!==undefined?c.themDisplay:c.them}</div>`;
+    el.appendChild(wrap);
+  });
+}
+renderCompare(document.getElementById('season-compare'), D.seasonCompare);
+renderCompare(document.getElementById('match-compare'), LM.compare);
+
+// ---- SCOREBOARD (Latest) ----
+const sl=LM.scoreLine;
+document.getElementById('sb-comp').textContent=`${LM.meta.comp} · ${LM.meta.date}`;
+document.getElementById('sb-venue').textContent=`${LM.meta.venue}${LM.meta.ref?' · Ref: '+LM.meta.ref:''}`;
+document.getElementById('sb-them-name').textContent=LM.meta.opp;
+document.getElementById('sb-us-score').textContent=sl.us.main;
+document.getElementById('sb-them-score').textContent=sl.them.main;
+document.getElementById('sb-us-frees').textContent='frees '+sl.us.frees;
+document.getElementById('sb-them-frees').textContent='';
+if(sl.us.twoPt||sl.them.twoPt){
+  const parts=[];
+  if(sl.us.twoPt) parts.push(`St Judes ${sl.us.twoPt}x2pt`);
+  if(sl.them.twoPt) parts.push(`${LM.meta.opp} ${sl.them.twoPt}x2pt`);
+  document.getElementById('sb-2pt').textContent='2-Pointers: '+parts.join(' · ');
+}
+const m=sl.margin, bn=document.getElementById('result-banner');
+bn.textContent=m>0?`WIN by ${m} point${m===1?'':'s'}`:m<0?`LOSS by ${-m} point${-m===1?'':'s'}`:'DRAW';
+if(m<0){bn.style.color='#e04545';bn.style.background='rgba(224,69,69,0.12)';bn.style.borderColor='rgba(224,69,69,0.3)';}
+else if(m===0){bn.style.color='#f0c040';bn.style.background='rgba(240,192,64,0.12)';bn.style.borderColor='rgba(240,192,64,0.3)';}
+
+// ---- TIMELINE ----
+function drawTimeline(data){
+  const svg=document.getElementById('timeline-svg');
+  const W=600,H=200,pL=34,pR=14,pT=14,pB=28,ML=60;
+  const maxS=Math.max(...data.map(p=>Math.max(p.h,p.a)),1);
+  const x=t=>pL+(t/ML)*(W-pL-pR), y=v=>H-pB-(v/maxS)*(H-pT-pB);
+  let s='';
+  for(let v=0;v<=maxS;v+=Math.ceil(maxS/5)){
+    s+=`<line x1="${pL}" y1="${y(v)}" x2="${W-pR}" y2="${y(v)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    s+=`<text x="${pL-6}" y="${y(v)+4}" font-size="9" fill="#7a90aa" text-anchor="end">${v}</text>`;
+  }
+  s+=`<line x1="${x(30)}" y1="${pT}" x2="${x(30)}" y2="${H-pB}" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  s+=`<text x="${x(30)}" y="${H-10}" font-size="9" fill="#7a90aa" text-anchor="middle">HT</text>`;
+  function path(key,color){
+    let pts=[[0,0]]; data.forEach(p=>pts.push([p.m,p[key]])); pts.push([ML,pts[pts.length-1][1]]);
+    let d=`M ${x(pts[0][0])} ${y(pts[0][1])}`;
+    for(let i=1;i<pts.length;i++) d+=` L ${x(pts[i][0])} ${y(pts[i-1][1])} L ${x(pts[i][0])} ${y(pts[i][1])}`;
+    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+  }
+  s+=path('a','#7a90aa'); s+=path('h','#34c967');
+  [0,15,45,60].forEach(t=>{ s+=`<text x="${x(t)}" y="${H-10}" font-size="9" fill="#7a90aa" text-anchor="middle">${t===0?"0'":t===60?"FT":t+"'"}</text>`; });
+  svg.innerHTML=s;
+}
+drawTimeline(LM.timeline);
+document.querySelector('#tl-opp-label').textContent=LM.meta.opp;
+
+// ---- PITCH MAPS ----
+function colFor(mode,code){
+  if(mode==='ko') return code==='W'?NEON.green:NEON.red;
+  if(code==='G') return NEON.purple;
+  if(code==='P'||code==='2') return NEON.green;
+  return NEON.red;
+}
+function renderShotPitch(svgEl,pts,zones){
+  const W=240,H=200,L=10,R=230,T=10,B=190,MX=120;
+  const yf=f=>T+((1-f)/0.5)*(B-T);
+  const y13=yf(0.907),y20=yf(0.857),yD=yf(0.764),yARC=yf(0.714),y45=yf(0.679),y65=yf(0.536);
+  const SR=15,LR=44; let s='';
+  s+=`<rect x="0" y="0" width="${W}" height="${H}" fill="${C_bg}"/>`;
+  s+=`<rect x="${L}" y="${T}" width="${R-L}" height="${B-T}" fill="none" stroke="${LN}" stroke-width="2" rx="2"/>`;
+  s+=`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="${LN2}" stroke-width="1.5" stroke-dasharray="8,5"/>`;
+  s+=`<rect x="${MX-SR}" y="${T}" width="${SR*2}" height="12" fill="none" stroke="${LN}" stroke-width="1.2"/>`;
+  s+=`<rect x="${MX-LR}" y="${T}" width="${LR*2}" height="${y13-T}" fill="none" stroke="${LN}" stroke-width="1.2"/>`;
+  s+=`<line x1="${L}" y1="${y13}" x2="${MX-LR}" y2="${y13}" stroke="${LN2}" stroke-width="1"/>`;
+  s+=`<line x1="${MX+LR}" y1="${y13}" x2="${R}" y2="${y13}" stroke="${LN2}" stroke-width="1"/>`;
+  s+=`<line x1="${L}" y1="${y20}" x2="${R}" y2="${y20}" stroke="${LN}" stroke-width="1.5"/>`;
+  s+=`<line x1="${L}" y1="${y45}" x2="${R}" y2="${y45}" stroke="${LN}" stroke-width="1.2"/>`;
+  s+=`<line x1="${L}" y1="${y65}" x2="${R}" y2="${y65}" stroke="${LN2}" stroke-width="1"/>`;
+  s+=`<path d="M${L+4},${y13} Q${MX},${2*yARC-y13} ${R-4},${y13}" fill="none" stroke="${LN}" stroke-width="2"/>`;
+  s+=`<path d="M${MX-30},${y20} Q${MX},${2*yD-y20} ${MX+30},${y20}" fill="none" stroke="${LN}" stroke-width="1.3"/>`;
+  s+=`<line x1="${MX-16}" y1="${T-2}" x2="${MX+16}" y2="${T-2}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`;
+  if(zones) zones.forEach(z=>{
+    const yTop=yf(z.toX),yBot=yf(z.fromX);
+    const col=z.pct>=60?NEON.green:z.pct>=45?"#ffdd00":NEON.red;
+    s+=`<rect x="${L}" y="${yTop}" width="${R-L}" height="${yBot-yTop}" fill="${col}" opacity="0.07"/>`;
+    s+=`<line x1="${L}" y1="${yBot}" x2="${R}" y2="${yBot}" stroke="${col}" stroke-width="0.6" opacity="0.4" stroke-dasharray="3,3"/>`;
+    s+=`<rect x="${R-58}" y="${yTop+4}" width="52" height="22" rx="4" fill="${C_bg}" opacity="0.85"/>`;
+    s+=`<text x="${R-32}" y="${yTop+13}" fill="${col}" font-size="9" font-weight="900" font-family="monospace" text-anchor="middle">${z.pct}%</text>`;
+    s+=`<text x="${R-32}" y="${yTop+22}" fill="#7a90aa" font-size="5.5" font-family="monospace" text-anchor="middle">${z.label} · ${z.n}</text>`;
+  });
+  pts.forEach(d=>{
+    if(d[0]<0.5) return;
+    s+=`<circle cx="${L+d[1]*(R-L)}" cy="${yf(d[0])}" r="3.5" fill="${colFor('shots',d[2])}" opacity="0.7" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>`;
+  });
+  svgEl.innerHTML=s;
+}
+function renderKoPitch(svgEl,pts){
+  // Half-pitch version — fold kickouts same as shots (attacking goal at top)
+  renderShotPitch(svgEl, pts.map(d => {
+    // Fold: if x>0.5, ax=x,side=y; else ax=1-x,side=1-y
+    let ax,side;
+    if(d[0]>0.5){ax=d[0];side=d[1];}else{ax=1-d[0];side=1-d[1];}
+    return [ax, side, d[2]];
+  }), null);
+  // Re-render dots with KO colors over the shot pitch
+  const W=240,H=200,L=10,R=230,T=10,B=190;
+  const yf=f=>T+((1-f)/0.5)*(B-T);
+  let extra='';
+  pts.forEach(d=>{
+    let ax,side;
+    if(d[0]>0.5){ax=d[0];side=d[1];}else{ax=1-d[0];side=1-d[1];}
+    if(ax<0.5) return;
+    const px=L+(side*(R-L)), py=yf(ax);
+    const col=d[2]==='W'?NEON.green:NEON.red;
+    extra+=`<circle cx="${px}" cy="${py}" r="3" fill="${col}" opacity="0.7" stroke="rgba(255,255,255,0.3)" stroke-width="0.3"/>`;
+  });
+  svgEl.innerHTML+=extra;
+}
+function renderKoGrid(el,grid){
+  el.innerHTML=''; el.appendChild(document.createElement('div'));
+  ["LEFT","CENTRE","RIGHT"].forEach(c=>{const d=document.createElement('div');d.className='colhead';d.textContent=c;el.appendChild(d);});
+  ["SHORT","MID","LONG"].forEach((rl,ri)=>{
+    const rh=document.createElement('div');rh.className='rowhead';rh.textContent=rl;el.appendChild(rh);
+    grid[ri].forEach(cell=>{
+      const col=cell.pct===null?'#7a90aa':cell.pct>=70?NEON.green:cell.pct>=55?'#ffdd00':NEON.red;
+      const d=document.createElement('div'); d.className='ko-cell';
+      d.style.borderColor=cell.pct===null?'#111a2e':col+'55';
+      d.style.background=cell.pct===null?'#080f20':col+'15';
+      d.innerHTML=`<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} KOs</div>`;
+      el.appendChild(d);
+    });
+  });
+}
+
+// Setup pitch map toggles
+function setupPitchMap(prefix, ptsUs, ptsOpp, zonesUs, zonesOpp, koUs, koOpp, koGridUs, koGridOpp, koWonUs, koWonOpp){
+  zoneState[prefix+'shots']=true; zoneState[prefix+'opp']=true;
+  function refreshShots(){
+    const sc=ptsUs.filter(d=>isSc(d[2])).length;
+    document.getElementById(`pm-${prefix}shots-sub`).textContent=`${ptsUs.length} SHOTS · ${sc} SCORES (${ptsUs.length?Math.round(sc/ptsUs.length*100):0}%)`;
+    renderShotPitch(document.getElementById(`pitch-${prefix}shots`),ptsUs,zoneState[prefix+'shots']?zonesUs:null);
+    const b=document.getElementById(`ztog-${prefix}shots`);
+    b.textContent=zoneState[prefix+'shots']?'◉ ZONE CONVERSION ON':'○ ZONE CONVERSION OFF';
+    b.classList.toggle('off',!zoneState[prefix+'shots']);
+  }
+  function refreshOpp(){
+    const sc=ptsOpp.filter(d=>isSc(d[2])).length;
+    document.getElementById(`pm-${prefix}opp-sub`).textContent=`${ptsOpp.length} OPP SHOTS · ${sc} CONCEDED (${ptsOpp.length?Math.round(sc/ptsOpp.length*100):0}%)`;
+    renderShotPitch(document.getElementById(`pitch-${prefix}opp`),ptsOpp,zoneState[prefix+'opp']?zonesOpp:null);
+    const b=document.getElementById(`ztog-${prefix}opp`);
+    b.textContent=zoneState[prefix+'opp']?'◉ ZONE CONVERSION ON':'○ ZONE CONVERSION OFF';
+    b.classList.toggle('off',!zoneState[prefix+'opp']);
+  }
+  function refreshKo(){
+    document.getElementById(`pm-${prefix}ko-sub`).textContent=`${koWonUs.total} OWN KOs · ${koWonUs.won} WON (${koWonUs.pct}%)`;
+    renderKoPitch(document.getElementById(`pitch-${prefix}ko`),koUs);
+    renderKoGrid(document.getElementById(`ko-${prefix}grid`),koGridUs);
+  }
+  function refreshOppKo(){
+    document.getElementById(`pm-${prefix}oppko-sub`).textContent=`${koWonOpp.total} OPP KOs · ${koWonOpp.won} WON (${koWonOpp.pct}%)`;
+    renderKoPitch(document.getElementById(`pitch-${prefix}oppko`),koOpp);
+    renderKoGrid(document.getElementById(`ko-${prefix}oppgrid`),koGridOpp);
+  }
+  refreshShots(); refreshOpp(); refreshKo(); refreshOppKo();
+  document.getElementById(`ztog-${prefix}shots`).addEventListener('click',()=>{zoneState[prefix+'shots']=!zoneState[prefix+'shots'];refreshShots();});
+  document.getElementById(`ztog-${prefix}opp`).addEventListener('click',()=>{zoneState[prefix+'opp']=!zoneState[prefix+'opp'];refreshOpp();});
+}
+
+setupPitchMap('s-', D.seasonShotsUs, D.seasonShotsOpp, D.seasonZonesUs, D.seasonZonesOpp, D.seasonKoUs, D.seasonKoOpp, D.seasonKoGridUs, D.seasonKoGridOpp, D.seasonKoWonUs, D.seasonKoWonOpp);
+setupPitchMap('m-', LM.shotsUs, LM.shotsOpp, LM.zonesUs, LM.zonesOpp, LM.koUs, LM.koOpp, LM.koGridUs, LM.koGridOpp, LM.koWonUs, LM.koWonOpp);
+
+// Pitch map tab switching (works for both groups)
+document.querySelectorAll('.view-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const group=tab.closest('.card');
+    group.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+    group.querySelectorAll('.pmview').forEach(v=>v.style.display='none');
+    tab.classList.add('active');
+    document.getElementById('pm-'+tab.dataset.pmview).style.display='block';
+  });
+});
+
+// ---- KO SPEED ----
+// ---- KO SPEED SEASON (p10 / avg / p90) ----
+const lks = D.leagueKoSpeed;
+const ksEl = document.getElementById('ko-speed-season');
+const maxT = Math.max(lks.brayP90, lks.oppP90, 50);
+
+function renderSpeedRow(el, label, color, p10, avg, p90) {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = `width:52px;font-size:0.65rem;color:${color};font-family:monospace;font-weight:700;flex-shrink:0;`;
+  lbl.textContent = label;
+  const bar = document.createElement('div');
+  bar.style.cssText = 'flex:1;position:relative;height:26px;background:rgba(255,255,255,0.05);border-radius:6px;';
+  const pctL = (p10/maxT*100);
+  const pctR = (p90/maxT*100);
+  const pctA = (avg/maxT*100);
+  bar.innerHTML = `
+    <div style="position:absolute;left:${pctL}%;right:${100-pctR}%;top:3px;bottom:3px;background:${color};opacity:0.15;border-radius:4px;"></div>
+    <div style="position:absolute;left:${pctL}%;top:0;bottom:0;width:2px;background:${color};opacity:0.5;border-radius:1px;"></div>
+    <div style="position:absolute;left:${pctR}%;top:0;bottom:0;width:2px;background:${color};opacity:0.5;border-radius:1px;"></div>
+    <div style="position:absolute;left:${pctA}%;top:-2px;bottom:-2px;width:3px;background:${color};border-radius:2px;"></div>
+    <span style="position:absolute;left:${pctL-1}%;top:50%;transform:translate(-100%,-50%);font-size:0.6rem;color:${color};font-family:monospace;font-weight:700;">${p10}s</span>
+    <span style="position:absolute;left:${pctA}%;top:50%;transform:translate(-50%,-160%);font-size:0.65rem;color:${color};font-family:monospace;font-weight:900;">${avg}s</span>
+    <span style="position:absolute;left:${pctR+1}%;top:50%;transform:translate(0%,-50%);font-size:0.6rem;color:${color};font-family:monospace;font-weight:700;">${p90}s</span>`;
+  row.appendChild(lbl);
+  row.appendChild(bar);
+  el.appendChild(row);
+}
+
+renderSpeedRow(ksEl, 'JUDES', '#34c967', lks.brayP10, lks.brayAvg, lks.brayP90);
+renderSpeedRow(ksEl, 'OPP', '#7a90aa', lks.oppP10, lks.oppAvg, lks.oppP90);
+
+const ksLeg = document.createElement('div');
+ksLeg.className = 'legend';
+ksLeg.style.marginTop = '8px';
+ksLeg.innerHTML = '<span style="font-size:0.62rem;">Shaded = 10th–90th percentile range · Bar = average</span>';
+ksEl.appendChild(ksLeg);
+
+// ---- KO MATRIX (Distance x Speed) ----
+const kmEl = document.getElementById('ko-matrix');
+const km = D.koMatrix;
+kmEl.innerHTML = '';
+kmEl.appendChild(document.createElement('div'));
+const speedLabels = [`⚡ FAST`, `▸ MED`, `🐢 SLOW`];
+const speedSubs = [km.speedThresholds.fast, km.speedThresholds.medium, km.speedThresholds.slow];
+speedLabels.forEach((c,i)=>{
+  const d = document.createElement('div');
+  d.className='colhead';
+  d.innerHTML=`${c}<br><span style="font-size:0.52rem;opacity:0.7;">${speedSubs[i]}</span>`;
+  kmEl.appendChild(d);
+});
+['SHORT','MID','LONG'].forEach((rl,ri)=>{
+  const rh = document.createElement('div');
+  rh.className='rowhead';
+  rh.textContent=rl;
+  kmEl.appendChild(rh);
+  km.matrix[ri].forEach(cell=>{
+    const col = cell.pct===null ? '#7a90aa' : cell.pct>=70 ? NEON.green : cell.pct>=55 ? '#ffdd00' : NEON.red;
+    const div = document.createElement('div');
+    div.className='ko-cell';
+    div.style.borderColor = cell.pct===null ? '#111a2e' : col+'55';
+    div.style.background = cell.pct===null ? '#080f20' : col+'15';
+    div.innerHTML=`<div class="pct" style="color:${col}">${cell.pct===null?'—':cell.pct+'%'}</div><div class="n">${cell.n} KOs</div>`;
+    kmEl.appendChild(div);
+  });
+});
+document.getElementById('ko-matrix-insight').textContent =
+  'Long puck-outs contested deep in opposition half win at 80%+. Short puck-outs (own half) win only 39-50%. Mid-centre is the sweet spot at 67%. The data shows: aim to move the contest further up the pitch.';
+
+// ---- PERIOD SCORING CHARTS ----
+function renderPeriodChart(svgId, bray, opp, labels){
+  const svg=document.getElementById(svgId);
+  const W=600,H=220,pL=40,pR=16,pT=20,pB=36;
+  const n=labels.length;
+  const maxV=Math.max(...bray,...opp,1);
+  const barW=((W-pL-pR)/n)*0.35;
+  const gap=4;
+  let s='';
+
+  // Gridlines
+  for(let v=0;v<=maxV;v+=Math.ceil(maxV/4)){
+    const yy=H-pB-(v/maxV)*(H-pT-pB);
+    s+=`<line x1="${pL}" y1="${yy}" x2="${W-pR}" y2="${yy}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    s+=`<text x="${pL-6}" y="${yy+4}" font-size="9" fill="#7a90aa" text-anchor="end" font-family="monospace">${v}</text>`;
+  }
+
+  // HT marker
+  const htX=pL+(3/n)*(W-pL-pR);
+  s+=`<line x1="${htX}" y1="${pT}" x2="${htX}" y2="${H-pB}" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  s+=`<text x="${htX}" y="${H-pB+14}" font-size="8" fill="#7a90aa" text-anchor="middle" font-family="monospace">HT</text>`;
+
+  labels.forEach((lbl,i)=>{
+    const cx=pL+((i+0.5)/n)*(W-pL-pR);
+    const bH=(bray[i]/maxV)*(H-pT-pB);
+    const oH=(opp[i]/maxV)*(H-pT-pB);
+    const bY=H-pB-bH;
+    const oY=H-pB-oH;
+    const diff=bray[i]-opp[i];
+
+    // Bray bar (left)
+    s+=`<rect x="${cx-barW-gap/2}" y="${bY}" width="${barW}" height="${bH}" fill="#5ba3e0" rx="3" opacity="0.85"/>`;
+    if(bray[i]>0) s+=`<text x="${cx-barW/2-gap/2}" y="${bY-4}" font-size="9" fill="#5ba3e0" text-anchor="middle" font-family="monospace" font-weight="800">${bray[i]}</text>`;
+
+    // Opp bar (right)
+    s+=`<rect x="${cx+gap/2}" y="${oY}" width="${barW}" height="${oH}" fill="#7a90aa" rx="3" opacity="0.5"/>`;
+    if(opp[i]>0) s+=`<text x="${cx+barW/2+gap/2}" y="${oY-4}" font-size="9" fill="#7a90aa" text-anchor="middle" font-family="monospace" font-weight="800">${opp[i]}</text>`;
+
+    // Diff indicator
+    const diffCol=diff>0?'#34c967':diff<0?'#e04545':'#7a90aa';
+    const diffStr=diff>0?'+'+diff:diff===0?'0':''+diff;
+    s+=`<text x="${cx}" y="${H-pB+14}" font-size="8" fill="${diffCol}" text-anchor="middle" font-family="monospace" font-weight="700">${diffStr}</text>`;
+
+    // Period label
+    s+=`<text x="${cx}" y="${H-4}" font-size="8" fill="#7a90aa" text-anchor="middle" font-family="monospace">${lbl}</text>`;
+  });
+
+  svg.innerHTML=s;
+}
+
+const ps=D.periodScoring;
+renderPeriodChart('period-season-svg', ps.seasonBray, ps.seasonOpp, ps.labels);
+
+// Insight
+const diffs=ps.labels.map((_,i)=>ps.seasonBray[i]-ps.seasonOpp[i]);
+const bestIdx=diffs.indexOf(Math.max(...diffs));
+const worstIdx=diffs.indexOf(Math.min(...diffs));
+document.getElementById('period-season-insight').textContent=
+  `Strongest period: ${ps.labels[bestIdx]} (St Judes +${diffs[bestIdx]}). Weakest: ${ps.labels[worstIdx]} (${diffs[worstIdx]>=0?'+':''}${diffs[worstIdx]}). The first 10 minutes of the second half (30-40) is where St Judes' advantage disappears — the key vulnerability window to address.`;
+
+// Latest match period chart
+const lps=LM.periodScoring;
+renderPeriodChart('period-match-svg', lps.bray, lps.opp, ps.labels);
+document.getElementById('period-opp-label').textContent=LM.meta.opp;
+
+// ---- DONUTS ----
+function renderDonut(svgEl,legEl,dataObj){
+  const entries=Object.entries(dataObj); const total=entries.reduce((a,[,v])=>a+v,0);
+  const cx=60,cy=60,r=45,stroke=18,circ=2*Math.PI*r; let offset=0, s='';
+  entries.forEach(([,val],i)=>{
+    const len=val/total*circ, color=DC[i%DC.length];
+    s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset+=len;
+  });
+  s+=`<text x="${cx}" y="${cy-1}" fill="#eef2f8" font-size="19" font-weight="900" font-family="monospace" text-anchor="middle">${total}</text>`;
+  s+=`<text x="${cx}" y="${cy+12}" fill="#7a90aa" font-size="7" font-family="monospace" text-anchor="middle">TOTAL</text>`;
+  svgEl.innerHTML=s; legEl.innerHTML='';
+  entries.forEach(([label,val],i)=>{
+    const color=DC[i%DC.length], pct=Math.round(val/total*100);
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:5px;font-size:0.65rem;color:var(--text-dim);margin-bottom:3px;';
+    d.innerHTML=`<span style="width:7px;height:7px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span><span style="flex:1;text-align:left;">${label}</span><span style="color:var(--text);font-weight:700;">${val} (${pct}%)</span>`;
+    legEl.appendChild(d);
+  });
+}
+renderDonut(document.getElementById('donut-s-us'),document.getElementById('donut-s-us-legend'),D.seasonPossLost.us);
+renderDonut(document.getElementById('donut-s-them'),document.getElementById('donut-s-them-legend'),D.seasonPossLost.them);
+renderDonut(document.getElementById('donut-m-us'),document.getElementById('donut-m-us-legend'),LM.possLost.us);
+if(Object.keys(LM.possLost.them).length){
+  renderDonut(document.getElementById('donut-m-them'),document.getElementById('donut-m-them-legend'),LM.possLost.them);
+  document.getElementById('donut-m-opp-label').textContent=LM.meta.opp.toUpperCase();
+}
+
+// ---- MATCH SCORERS ----
+const msEl=document.getElementById('match-scorers');
+LM.scorers.forEach((p,i)=>{
+  const d=document.createElement('div'); d.className='lb-row';
+  d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.notation}</div><div class="lb-val">${p.total}</div>`;
+  msEl.appendChild(d);
+});
+
+// ---- MATCH TACKLES ----
+const mtEl=document.getElementById('match-tackles');
+LM.tackles.forEach((p,i)=>{
+  const d=document.createElement('div'); d.className='lb-row';
+  d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
+  mtEl.appendChild(d);
+});
+
+
+
+</script>
+</body>
 </html>
