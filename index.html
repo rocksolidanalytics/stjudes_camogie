@@ -405,6 +405,7 @@ window.__RSA__ = {"resultsTable":[{"date":"25 Mar 2026","opp":"Erins Isle","us":
 
 
 
+
 const D = window.__RSA__;
 const LM = D.latestMatch;
 const NEON = {green:"#5ba3e0",red:"#e04545",purple:"#88c0f0",gold:"#88c0f0"};
@@ -455,7 +456,7 @@ function renderMatchReport(idx){
   let html = `
   <div class="card">
     <div class="scoreboard">
-      <div class="sb-meta"><div class="sb-meta-line">${M.meta.comp} · vs ${M.meta.opp}</div></div>
+      
       <div class="sb-row">
         <div class="sb-team us"><div class="sb-team-name">St Judes</div><div class="sb-score">${sl.us.main}</div><div class="sb-frees">frees ${sl.us.frees}</div></div>
         <div class="sb-vs">v</div>
@@ -742,8 +743,8 @@ renderCompare(document.getElementById('match-compare'), LM.compare);
 
 // ---- SCOREBOARD (Latest) ----
 const sl=LM.scoreLine;
-document.getElementById('sb-comp').textContent=`${LM.meta.comp} · vs ${LM.meta.opp}`;
-document.getElementById('sb-venue').textContent=LM.meta.venue||'';
+document.getElementById('sb-comp').textContent='';
+document.getElementById('sb-venue').textContent='';
 document.getElementById('sb-them-name').textContent=LM.meta.opp;
 document.getElementById('sb-us-score').textContent=sl.us.main;
 document.getElementById('sb-them-score').textContent=sl.them.main;
@@ -1090,6 +1091,7 @@ LM.tackles.forEach((p,i)=>{
   d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
   mtEl.appendChild(d);
 });
+
 
 
 
