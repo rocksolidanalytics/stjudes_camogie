@@ -223,14 +223,14 @@
     </div>
     <div id="pm-s-ko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-s-ko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-ko" viewBox="0 0 480 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-ko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Puck-Out Win % by Zone</div>
       <div class="ko-grid" id="ko-s-grid"></div>
     </div>
     <div id="pm-s-oppko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-s-oppko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-oppko" viewBox="0 0 480 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-oppko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Opposition Puck-Out Win % by Zone</div>
       <div class="ko-grid" id="ko-s-oppgrid"></div>
@@ -409,6 +409,7 @@ window.__RSA__ = {"resultsTable":[{"date":"25 Mar 2026","opp":"Erins Isle","us":
 
 
 
+
 const D = window.__RSA__;
 const LM = D.latestMatch;
 const NEON = {green:"#5ba3e0",red:"#e04545",purple:"#88c0f0",gold:"#88c0f0"};
@@ -503,14 +504,14 @@ function renderMatchReport(idx){
     </div>
     <div id="pm-mr${idx}-ko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-mr${idx}-ko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-ko" viewBox="0 0 480 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-ko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Kickout Win % by Zone</div>
       <div class="ko-grid" id="ko-mr${idx}-grid"></div>
     </div>
     <div id="pm-mr${idx}-oppko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-mr${idx}-oppko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-oppko" viewBox="0 0 480 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-oppko" viewBox="0 0 240 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Opposition KO Win % by Zone</div>
       <div class="ko-grid" id="ko-mr${idx}-oppgrid"></div>
@@ -831,33 +832,41 @@ function renderShotPitch(svgEl,pts,zones){
   svgEl.innerHTML=s;
 }
 function renderKoPitch(svgEl, pts){
-  // Full pitch, dots at contest location, no trajectories
-  const W=480, H=200, pL=12, pR=12, pT=12, pB=20;
-  const pw=W-pL-pR, ph=H-pT-pB;
-  let s=`<rect width="${W}" height="${H}" fill="#0a1a10" rx="6"/>`;
-  for(let i=0;i<8;i++) s+=`<rect x="${pL+i*(pw/8)}" width="${pw/8}" height="${H}" fill="${i%2===0?'#0c1f12':'#0a1a10'}" opacity="0.35"/>`;
-  s+=`<rect x="${pL}" y="${pT}" width="${pw}" height="${ph}" fill="none" stroke="#2a4a30" stroke-width="1.2" rx="2"/>`;
-  s+=`<line x1="${W/2}" y1="${pT}" x2="${W/2}" y2="${H-pB}" stroke="#2a4a30" stroke-width="0.8"/>`;
-  s+=`<circle cx="${W/2}" cy="${(H-pB+pT)/2}" r="18" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
-  // Left goal (Judes — puck-out origin)
-  s+=`<line x1="${pL}" y1="${H*0.37}" x2="${pL}" y2="${H*0.63}" stroke="#aaffaa" stroke-width="2.5"/>`;
-  s+=`<line x1="${pL}" y1="${H*0.37}" x2="${pL+14}" y2="${H*0.37}" stroke="#aaffaa" stroke-width="1.2"/>`;
-  s+=`<line x1="${pL}" y1="${H*0.63}" x2="${pL+14}" y2="${H*0.63}" stroke="#aaffaa" stroke-width="1.2"/>`;
-  // Right goal (opposition)
-  s+=`<line x1="${W-pR}" y1="${H*0.37}" x2="${W-pR}" y2="${H*0.63}" stroke="#556655" stroke-width="2.5"/>`;
-  s+=`<line x1="${W-pR}" y1="${H*0.37}" x2="${W-pR-14}" y2="${H*0.37}" stroke="#556655" stroke-width="1.2"/>`;
-  s+=`<line x1="${W-pR}" y1="${H*0.63}" x2="${W-pR-14}" y2="${H*0.63}" stroke="#556655" stroke-width="1.2"/>`;
-  // Zone lines: Short x<0.60, Mid 0.60-0.75, Long 0.75+
-  const xShort=pL+0.60*pw, xLong=pL+0.75*pw;
-  s+=`<line x1="${xShort}" y1="${pT}" x2="${xShort}" y2="${H-pB}" stroke="#2a4a30" stroke-width="0.8" stroke-dasharray="3,2"/>`;
-  s+=`<line x1="${xLong}" y1="${pT}" x2="${xLong}" y2="${H-pB}" stroke="#2a4a30" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+  // Half-pitch, same as shot map (240x200), goal at top, dots only
+  const W=240, H=200, L=10, R=230, T=10, B=190;
+  // Remap x from 0.5-1.0 to full vertical span, y to horizontal
+  // Use same coordinate system as renderShotPitch
+  const yf=f=>T+((1-f)/0.5)*(B-T);
+  // Draw half-pitch background (same as shots)
+  let s=`<rect width="${W}" height="${H}" fill="#0a1a10" rx="5"/>`;
+  s+=`<rect x="1" y="1" width="${W-2}" height="${H-2}" fill="none" stroke="#1a3a1f" stroke-width="0.6" rx="5"/>`;
+  // Pitch outline
+  s+=`<rect x="${L}" y="${T}" width="${R-L}" height="${B-T}" fill="none" stroke="#2a4a30" stroke-width="1.2"/>`;
+  // Goal at top
+  s+=`<line x1="${W/2-20}" y1="${T}" x2="${W/2+20}" y2="${T}" stroke="#aaffaa" stroke-width="2.5"/>`;
+  s+=`<rect x="${W/2-30}" y="${T}" width="60" height="18" fill="none" stroke="#2a4a30" stroke-width="0.8"/>`;
+  // Small square
+  s+=`<rect x="${W/2-16}" y="${T}" width="32" height="9" fill="none" stroke="#2a4a30" stroke-width="0.6"/>`;
+  // D arc
+  s+=`<path d="M ${W/2-40} ${T+18} Q ${W/2} ${T+50} ${W/2+40} ${T+18}" fill="none" stroke="#2a4a30" stroke-width="0.7"/>`;
+  // 45m arc (mapped to ~x=0.66 in normalised coords)
+  const y45=yf(0.66);
+  s+=`<line x1="${L}" y1="${y45}" x2="${R}" y2="${y45}" stroke="#2a4a30" stroke-width="0.6" stroke-dasharray="3,2"/>`;
+  // Zone boundary lines: Short < 0.60, Mid 0.60-0.75, Long >= 0.75
+  const yShort=yf(0.60);
+  const yLong=yf(0.75);
+  s+=`<line x1="${L}" y1="${yShort}" x2="${R}" y2="${yShort}" stroke="#3a5a40" stroke-width="0.8" stroke-dasharray="4,3"/>`;
+  s+=`<line x1="${L}" y1="${yLong}" x2="${R}" y2="${yLong}" stroke="#3a5a40" stroke-width="0.8" stroke-dasharray="4,3"/>`;
   // Zone labels
-  s+=`<text x="${pL+0.30*pw}" y="${H-5}" font-size="7" fill="#3a5a40" text-anchor="middle" font-family="monospace">SHORT</text>`;
-  s+=`<text x="${pL+0.675*pw}" y="${H-5}" font-size="7" fill="#3a5a40" text-anchor="middle" font-family="monospace">MID</text>`;
-  s+=`<text x="${pL+0.875*pw}" y="${H-5}" font-size="7" fill="#3a5a40" text-anchor="middle" font-family="monospace">LONG</text>`;
-  // Dots — x is already 0-1 across full pitch (0=left goal, 1=right goal)
+  s+=`<text x="${R+2}" y="${(yf(0.50)+yShort)/2+3}" font-size="7" fill="#3a5a40" font-family="monospace">SHORT</text>`;
+  s+=`<text x="${R+2}" y="${(yShort+yLong)/2+3}" font-size="7" fill="#3a5a40" font-family="monospace">MID</text>`;
+  s+=`<text x="${R+2}" y="${(yLong+yf(1.0))/2+3}" font-size="7" fill="#3a5a40" font-family="monospace">LONG</text>`;
+  // Dots
   pts.forEach(d=>{
-    const px=pL+d[0]*pw, py=pT+d[1]*ph;
+    let ax,side;
+    if(d[0]>0.5){ax=d[0];side=d[1];}else{ax=1-d[0];side=1-d[1];}
+    if(ax<0.5) return;
+    const px=L+(side*(R-L)), py=yf(ax);
     const col=d[2]==='W'?NEON.green:NEON.red;
     s+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.5" fill="${col}" opacity="0.75" stroke="rgba(0,0,0,0.3)" stroke-width="0.5"/>`;
   });
@@ -1106,6 +1115,7 @@ LM.tackles.forEach((p,i)=>{
   d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
   mtEl.appendChild(d);
 });
+
 
 
 
