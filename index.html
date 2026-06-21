@@ -223,14 +223,14 @@
     </div>
     <div id="pm-s-ko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-s-ko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-ko" viewBox="0 0 240 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-ko" viewBox="0 0 480 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Puck-Out Win % by Zone</div>
       <div class="ko-grid" id="ko-s-grid"></div>
     </div>
     <div id="pm-s-oppko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-s-oppko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-oppko" viewBox="0 0 240 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-s-oppko" viewBox="0 0 480 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Opposition Puck-Out Win % by Zone</div>
       <div class="ko-grid" id="ko-s-oppgrid"></div>
@@ -406,6 +406,7 @@ window.__RSA__ = {"resultsTable":[{"date":"25 Mar 2026","opp":"Erins Isle","us":
 
 
 
+
 const D = window.__RSA__;
 const LM = D.latestMatch;
 const NEON = {green:"#5ba3e0",red:"#e04545",purple:"#88c0f0",gold:"#88c0f0"};
@@ -500,14 +501,14 @@ function renderMatchReport(idx){
     </div>
     <div id="pm-mr${idx}-ko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-mr${idx}-ko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-ko" viewBox="0 0 240 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-ko" viewBox="0 0 480 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Kickout Win % by Zone</div>
       <div class="ko-grid" id="ko-mr${idx}-grid"></div>
     </div>
     <div id="pm-mr${idx}-oppko" class="pmview" style="display:none">
       <div class="card-sub" id="pm-mr${idx}-oppko-sub"></div>
-      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-oppko" viewBox="0 0 240 200"></svg></div>
+      <div class="pitch-wrap"><svg class="pitch-svg" id="pitch-mr${idx}-oppko" viewBox="0 0 480 200"></svg></div>
       <div class="legend" style="margin-bottom:12px;"><span><i class="dot" style="background:#00ff88"></i>Won</span><span><i class="dot" style="background:#ff3355"></i>Lost</span></div>
       <div class="card-title" style="margin-top:5px;">Opposition KO Win % by Zone</div>
       <div class="ko-grid" id="ko-mr${idx}-oppgrid"></div>
@@ -1091,6 +1092,7 @@ LM.tackles.forEach((p,i)=>{
   d.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-name">${p.name}</div><div class="lb-sub">${p.frees>0?p.frees+' free'+(p.frees>1?'s':'')+' conceded':''}</div><div class="lb-val">${p.tackles}</div>`;
   mtEl.appendChild(d);
 });
+
 
 
 
