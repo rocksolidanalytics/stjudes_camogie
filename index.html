@@ -519,8 +519,15 @@ function renderMatchReport(idx){
   </div>
 
   <div class="card">
-    <div class="card-title">Tackles &amp; Frees Conceded</div>
+    <div class="card-title">Defensive Contributions</div>
+    <div style="font-size:0.65rem;font-family:monospace;color:var(--text-dim);margin-bottom:10px;">DC = Contacts + Turnovers Won + Rucks Won</div>
+    <div id="mr-dc-hdr-${idx}"></div>
     <div id="mr-tackles-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Turnovers &amp; Rucks</div>
+    <div id="mr-turnovers-${idx}"></div>
   </div>
 
   <div class="card">
@@ -1199,8 +1206,15 @@ LM.tackles.forEach((p,i)=>{
   </div>
 
   <div class="card">
-    <div class="card-title">Tackles &amp; Frees Conceded</div>
+    <div class="card-title">Defensive Contributions</div>
+    <div style="font-size:0.65rem;font-family:monospace;color:var(--text-dim);margin-bottom:10px;">DC = Contacts + Turnovers Won + Rucks Won</div>
+    <div id="mr-dc-hdr-${idx}"></div>
     <div id="mr-tackles-${idx}"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Turnovers &amp; Rucks</div>
+    <div id="mr-turnovers-${idx}"></div>
   </div>
 
   <div class="card">
